@@ -1,14 +1,14 @@
 \select@language {swedish}
 \contentsline {section}{\numberline {1}Introduktion}{1}
-\contentsline {section}{\numberline {2}Assignment 1}{2}
+\contentsline {section}{\numberline {2}Assignment 1 - Light LED2}{2}
 \contentsline {subsection}{\numberline {2.1}Assembly Program}{3}
-\contentsline {section}{\numberline {3}Assignment 2}{4}
+\contentsline {section}{\numberline {3}Assignment 2 - Switch light corresponding LED}{4}
 \contentsline {subsection}{\numberline {3.1}Assembly Program}{5}
-\contentsline {section}{\numberline {4}Assignment 3}{6}
+\contentsline {section}{\numberline {4}Assignment 3 - Swift5 lights LED0}{6}
 \contentsline {subsection}{\numberline {4.1}Assembly Program}{7}
 \contentsline {section}{\numberline {5}Assignment 4}{8}
 \contentsline {subsection}{\numberline {5.1}Assembly Program}{8}
-\contentsline {section}{\numberline {6}Assignment 5}{9}
+\contentsline {section}{\numberline {6}Assignment 5 - Waterfall}{9}
 \contentsline {subsection}{\numberline {6.1}Assembly Program}{10}
-\contentsline {section}{\numberline {7}Assignment 6}{11}
+\contentsline {section}{\numberline {7}Assignment 6 - Johnson counter}{11}
 \contentsline {subsection}{\numberline {7.1}Assembly Program}{12}

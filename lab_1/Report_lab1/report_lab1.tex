@@ -109,7 +109,7 @@ In the process of working with the laboratory assignments we started by doing re
 In each assignment we first created a pseudocode solution which we converted to flowchart diagrams, then it was rather simple to convert this into assembly language. Common for all assignments is also that we have been using the simulations to confirm that the program is working and completing the correct tasks. 
 
 \newpage
-\section{Assignment 1}
+\section{Assignment 1 - Light LED2}
 In the first assignment we were to light up LED2 (which is the third light counting from the right). 
 
 \begin{algorithm}
@@ -185,19 +185,19 @@ loop:
 
 \newpage
 
-\section{Assignment 2}
+\section{Assignment 2 - Switch light corresponding LED}
 \begin{algorithm}
 \begin{algorithmic}
 \Procedure{Pseudocode}{}
 \State{$PortB = output$}
 \State{$PortD = input$}
 \Repeat
-\State{$PortD\ value \rightarrow ledState$} \Comment{$ledState = register\ location$}
-\State{$Invert\ value\ at\ ledState$}
-\State{$ledState \rightarrow PortB$}
+\State{$PortD\ value \rightarrow switchState$} \Comment{$switchState = register\ location$}
+\State{$Invert\ value\ at\ switchState$}
+\State{$switchState \rightarrow PortB$}
 \Until{$\infty$}
 \EndProcedure
-\caption{Read switches and light corresponding LED}
+\caption{Switches pressed lights corresponding LED}
 \label{assign2.pseudo}
 \end{algorithmic}
 \end{algorithm}
@@ -268,7 +268,7 @@ loop:
 \end{lstlisting}
 \newpage
 
-\section{Assignment 3}
+\section{Assignment 3 - Swift5 lights LED0}
 \begin{algorithm}
 \begin{algorithmic}
 \Procedure{Pseudocode}{}
@@ -282,7 +282,7 @@ loop:
 \State{$ledState \rightarrow PortB$}
 \Until{$\infty$}
 \EndProcedure
-\caption{Read switch 5 and light LED0 when pressed}
+\caption{Light LED0 when switch5 is pressed}
 \label{assign2.pseudo}
 \end{algorithmic}
 \end{algorithm}
@@ -376,7 +376,7 @@ loop:
 \end{lstlisting}
 \newpage
 
-\section{Assignment 5}
+\section{Assignment 5 - Waterfall}
 \begin{algorithm}
 \begin{algorithmic}
 \Procedure{Pseudocode}{}
@@ -394,7 +394,7 @@ loop:
 \EndIf
 \Until{$\infty$}
 \EndProcedure
-\caption{}
+\caption{Waterfall simulation using LEDs}
 \label{}
 \end{algorithmic}
 \end{algorithm}
@@ -494,7 +494,7 @@ L1: dec  r21
 \end{lstlisting}
 \newpage
 
-\section{Assignment 6}
+\section{Assignment 6 - Johnson counter}
 \begin{algorithm}
 \begin{algorithmic}
 \Procedure{Pseudocode}{}
@@ -520,7 +520,7 @@ L1: dec  r21
 \State{$currentValue \rightarrow PortB$}
 \Until{$\infty$}
 \EndProcedure
-\caption{}
+\caption{Johnson counter simulation using LEDs}
 \label{}
 \end{algorithmic}
 \end{algorithm}
