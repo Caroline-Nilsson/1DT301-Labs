@@ -48,7 +48,7 @@ ldi ledOutput, 0x00
 out DDRD, ledOutput
 
 loop:
-	in switchInput, PIND        ; Read input from switches
+    in switchInput, PIND        ; Read input from switches
     com switchInput             ; Invert input bit string
-	out PORTB, switchInput      ; Output inverted bit string to LEDs
-	rjmp loop
+    out PORTB, switchInput      ; Output inverted bit string to LEDs
+    rjmp loop

@@ -39,5 +39,5 @@ out DDRB, ledOutput
 
 ; TODO: Test on hardware if it is neccessary to have this in a loop
 loop:
-	out PORTB, ledOutput        ; Turn on LED2 on PORTB
-	rjmp loop
+    out PORTB, ledOutput        ; Turn on LED2 on PORTB
+    rjmp loop
