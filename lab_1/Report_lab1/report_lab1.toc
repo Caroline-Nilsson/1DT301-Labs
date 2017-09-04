@@ -1,9 +1,14 @@
 \select@language {swedish}
 \contentsline {section}{\numberline {1}Introduktion}{1}
 \contentsline {section}{\numberline {2}Assignment 1}{2}
-\contentsline {section}{\numberline {3}Assignment 2}{3}
-\contentsline {section}{\numberline {4}Assignment 3}{4}
-\contentsline {section}{\numberline {5}Assignment 4}{5}
-\contentsline {section}{\numberline {6}Assignment 5}{6}
-\contentsline {section}{\numberline {7}Assignment 6}{7}
-\contentsline {section}{\numberline {A}Bilaga 1}{A}
+\contentsline {subsection}{\numberline {2.1}Assembly Program}{3}
+\contentsline {section}{\numberline {3}Assignment 2}{4}
+\contentsline {subsection}{\numberline {3.1}Assembly Program}{5}
+\contentsline {section}{\numberline {4}Assignment 3}{6}
+\contentsline {subsection}{\numberline {4.1}Assembly Program}{7}
+\contentsline {section}{\numberline {5}Assignment 4}{8}
+\contentsline {subsection}{\numberline {5.1}Assembly Program}{8}
+\contentsline {section}{\numberline {6}Assignment 5}{9}
+\contentsline {subsection}{\numberline {6.1}Assembly Program}{10}
+\contentsline {section}{\numberline {7}Assignment 6}{11}
+\contentsline {subsection}{\numberline {7.1}Assembly Program}{12}
