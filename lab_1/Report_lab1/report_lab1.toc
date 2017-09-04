@@ -1,0 +1,9 @@
+\select@language {swedish}
+\contentsline {section}{\numberline {1}Introduktion}{1}
+\contentsline {section}{\numberline {2}Assignment 1}{2}
+\contentsline {section}{\numberline {3}Assignment 2}{3}
+\contentsline {section}{\numberline {4}Assignment 3}{4}
+\contentsline {section}{\numberline {5}Assignment 4}{5}
+\contentsline {section}{\numberline {6}Assignment 5}{6}
+\contentsline {section}{\numberline {7}Assignment 6}{7}
+\contentsline {section}{\numberline {A}Bilaga 1}{A}
