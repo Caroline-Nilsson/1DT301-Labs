@@ -1,31 +1,46 @@
-
 \documentclass[a4paper, 12pt]{article}
+\usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
 \usepackage[T1]{fontenc}
 \usepackage{times}
 \usepackage[swedish]{babel}
 \usepackage[utf8]{inputenc}
-%\usepackage{dtklogos}
 \usepackage{wallpaper}
 \usepackage[absolute]{textpos}
 \usepackage[top=2cm, bottom=2.5cm, left=3cm, right=3cm]{geometry}
-\usepackage{appendix}
-\usepackage[nottoc]{tocbibind}
-\setcounter{secnumdepth}{3}
-\setcounter{tocdepth}{3}
 \usepackage{sectsty}
 \sectionfont{\fontsize{14}{15}\selectfont}
 \subsectionfont{\fontsize{12}{15}\selectfont}
 \subsubsectionfont{\fontsize{12}{15}\selectfont}
-\usepackage{csquotes} 
-\renewcommand{\thetable}{\arabic{section}.\arabic{table}}  
-\renewcommand{\thefigure}{\arabic{section}.\arabic{figure}} 
-\usepackage{amsmath}
 \usepackage{algorithm}
 \usepackage[noend]{algpseudocode}
-
 \usepackage{listings}
-\lstset{defaultdialect=[x86masm]Assembler}
 
+\definecolor{MyDarkGreen}{rgb}{0.0,0.4,0.0} % This is the color used for comments
+\lstloadlanguages{AVR}%
+\lstset{language=AVR, % AVR 8-bit Assembler
+        basicstyle=\tiny,
+        literate={å}{{\ra}}1
+                 {ä}{{\"a}}1
+                 {ö}{{\"o}}1,
+        keywordstyle=\color{Blue}\bf, % Instructions in blue, bold
+        keywordstyle=[2]\color{Orange}, % Registers and ports in orange
+        keywordstyle=[3]\color{Purple}, % Directives in purple
+        commentstyle=\color{MyDarkGreen},
+        tabsize=4, % 5 spaces per tab
+        numbers=left, % Line numbers on left
+        firstnumber=1, % Line numbers start with line 1
+        numberstyle=\tiny\color{Blue}, % Line numbers are blue and small
+        stepnumber=1 % Line numbers go in steps of 5
+}
+
+% Creates a new command to include an asm script,
+% the first parameter is the filename of the program (without .asm),
+% the second parameter is the caption
+\newcommand{\avrasm}[2]{
+\begin{itemize}
+\item[]\lstinputlisting[caption=#2,label=#1]{#1}
+\end{itemize}
+}
 
 \newsavebox{\mybox}
 \newlength{\mydepth}
@@ -50,8 +65,6 @@
     }
 }
 
-
-%\usepackage[backend=bibtex,bibencoding=ascii,style=authoryear,sorting=none]{biblatex}
 
 \title{	
 \vspace{-8cm}
@@ -135,54 +148,7 @@ The pseudocode (see algorithm \ref{assign1.pseudo}) and the flowchart (see figur
 Minimum lines of code?
 \newpage
 \subsection{Assembly Program}
-\begin{lstlisting}[basicstyle=\tiny]
-;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-;   1DT301, Computer Technology I
-;   Date: 2017-09-02
-;   Author:
-;                       Caroline Nilsson            (cn222nd)
-;                       Daniel Alm Grundstrom       (dg222dw)
-;
-;   Lab number:         1
-;   Title:              How to use the PORTs. Digital input /output.
-;                       Subroutine call.
-;
-;   Hardware:           STK600, CPU ATmega2560
-;
-;   Function:           Lights LED2 on PORTB
-;
-;   Input ports:        N/A
-;
-;   Output ports:       PIN2 on PORTB
-;
-;   Subroutines:        N/A
-;   Included files:     m2560def.inc
-;
-;   Other information:
-;
-;   Changes in program: 
-;                       2017-09-01:
-;                       Implemented flowchart design.
-;
-;                       2017-09-02:
-;                       Added comments and .def for r16
-;
-;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-.include "m2560def.inc"
-.def ledOutput = r16
-
-; Set PORTB to output
-ldi ledOutput, PINB2
-out DDRB, ledOutput
-
-; TODO: Test on hardware if it is neccessary to have this in a loop
-loop:
-    out PORTB, ledOutput        ; Turn on LED2 on PORTB
-    rjmp loop
-
-
-\end{lstlisting}
-
+\avrasm{../src/a1.asm}{}
 \newpage
 
 \section{Assignment 2 - Switch light corresponding LED}
@@ -209,63 +175,7 @@ loop:
 \end{figure}
 \newpage
 \subsection{Assembly Program}
-\begin{lstlisting}[basicstyle=\tiny]
-;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-;   1DT301, Computer Technology I
-;   Date: 2017-09-02
-;   Author:
-;                       Caroline Nilsson            (cn222nd)
-;                       Daniel Alm Grundstrom       (dg222dw)
-;
-;   Lab number:         1
-;   Title:              How to use the PORTs. Digital input /output.
-;                       Subroutine call.
-;
-;   Hardware:           STK600, CPU ATmega2560
-;
-;   Function:           Reads input from the switches SW0..SW7 and lights the
-;                       corresponding LED when a switch is pressed. (SW0 lights
-;                       LED0, SW1 lights LED1 and so on)
-;
-;   Input ports:        PORTD
-;
-;   Output ports:       PORTB
-;
-;   Subroutines:        N/A
-;   Included files:     m2560def.inc
-;
-;   Other information:  Since a pressed switch is registered as a 0 and a
-;                       released switch is registered as a 1. The bit string
-;                       read from PORTD must be inverted before the output
-;                       is redirected to the LEDs.
-;
-;   Changes in program: 
-;                       2017-09-01:
-;                       Implemented flowchart design.
-;
-;                       2017-09-02:
-;                       Adds header and comments.
-;
-;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-.include "m2560def.inc"
-.def switchInput = r16
-.def ledOutput = r17
-
-; Set PORTB (LEDs) as output
-ldi switchInput, 0xFF
-out DDRB, switchInput
-
-; Set PORTD (switches) as input
-ldi ledOutput, 0x00
-out DDRD, ledOutput
-
-loop:
-    in switchInput, PIND        ; Read input from switches
-    com switchInput             ; Invert input bit string
-    out PORTB, switchInput      ; Output inverted bit string to LEDs
-    rjmp loop
-
-\end{lstlisting}
+\avrasm{../src/a2.asm}{}
 \newpage
 
 \section{Assignment 3 - Swift5 lights LED0}
@@ -294,63 +204,7 @@ loop:
 \end{figure}
 \newpage
 \subsection{Assembly Program}
-\begin{lstlisting}[basicstyle=\tiny]
-;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-;   1DT301, Computer Technology I
-;   Date: 2017-09-04
-;   Author:
-;                       Caroline Nilsson            (cn222nd)
-;                       Daniel Alm Grundstrom       (dg222dw)
-;
-;   Lab number:         1
-;   Title:              How to use the PORTs. Digital input /output.
-;                       Subroutine call.
-;
-;   Hardware:           STK600, CPU ATmega2560
-;
-;   Function:           Turns on LED0 when SW5 is held down.
-;
-;   Input ports:        PORTD
-;
-;   Output ports:       PORTB
-;
-;   Subroutines:        N/A
-;   Included files:     m2560def.inc
-;
-;   Other information:  As with assignment 2, we have to keep in mind that
-;                       a pressed switch is registered as a 0.
-;
-;   Changes in program: 
-;                       2017-09-01:
-;                       Implemented flowchart design.
-;
-;                       2017-09-04:
-;                       Minor refactoring. Adds header and comments.
-;
-;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-.include "m2560def.inc"
-.def dataDir = r16
-.def ledState = r17
-
-; Set PortB as output
-ldi dataDir, 0xFF
-out DDRB, dataDir
-
-; Set PortD as input
-ldi dataDir, 0x00
-out DDRD, dataDir
-
-loop:
-    clr ledState                    ; Clear LED state so LED is turned off when
-                                    ; button is released
-
-    sbis PIND, PIND5                ; If SW5 is pressed down (PIND5 bit is zero)
-        ldi ledState, 0x01          ;   then set LED0 state to turned on
-
-    out PORTB, ledState             ; write state to LEDs
-    rjmp loop
-
-\end{lstlisting}
+\avrasm{../src/a3.asm}{}
 \newpage
 
 \section{Assignment 4}
@@ -406,92 +260,7 @@ loop:
 \end{figure}
 \newpage
 \subsection{Assembly Program}
-\begin{lstlisting}[basicstyle=\tiny]
-;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-;   1DT301, Computer Technology I
-;   Date: 2017-09-04
-;   Author:
-;                       Caroline Nilsson            (cn222nd)
-;                       Daniel Alm Grundstrom       (dg222dw)
-;
-;   Lab number:         1
-;   Title:              How to use the PORTs. Digital input /output.
-;                       Subroutine call.
-;
-;   Hardware:           STK600, CPU ATmega2560
-;
-;   Function:           Repeatedly lights LEDs sequentially right to left.
-;                       
-;                       I.e:
-;                       0000 0001 -> 0000 0010 -> 0000 0100 -> ... ->
-;                       1000 0000 -> 0000 0001 -> 0000 0010 -> ...
-;
-;   Input ports:        N/A
-;
-;   Output ports:       PORTB
-;
-;   Subroutines:        delay_500ms - delays execution for 500 ms
-;   Included files:     m2560def.inc
-;
-;   Other information:  Since a subroutine is used, the stack pointer must
-;                       be initialized so the processor knows where in the 
-;                       code to jump when the subroutine returns. 
-;
-;   Changes in program: 
-;                       2017-09-01:
-;                       Implements flowchart design
-;
-;                       2017-09-04:
-;                       Adds header, comments and some minor refactoring
-;
-;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-.include "m2560def.inc"
-.def dataDir = r16
-.def ledState = r17
-.def INITIAL_LED_STATE = 0x01
-
-; Initialize SP, Stack Pointer
-ldi r20, HIGH(RAMEND)                   ; R20 = high part of RAMEND address
-out SPH,R20                             ; SPH = high part of RAMEND address
-ldi R20, low(RAMEND)                    ; R20 = low part of RAMEND address
-out SPL,R20                             ; SPL = low part of RAMEND address
-
-; Set PORTB to output
-ldi dataDir, 0xFF
-out DDRB, dataDir
-
-ldi ledState, INITIAL_LED_STATE         ; Set initial LED state
-
-loop:
-    out PORTB, ledOutput                ; Write state to LEDs
-    rcall delay_500ms                   ; Delay to make changes visible
-
-    sbic PORTB, PORTB7                  ; If LED7 is lit
-        ldi ledState, INITIAL_LED_STATE ;    then reset LED state to initial
-
-    sbis PORTB, PORTB7                  ; else
-        lsl ledState                    ;    shift LED state to the left 
-    rjmp loop
-
-; Generated by delay loop calculator
-; at http://www.bretmulvey.com/avrdelay.html
-;
-; Delay 4 000 000 cycles
-; 500ms at 8.0 MHz
-delay_500ms:
-    ldi  r18, 21
-    ldi  r19, 75
-    ldi  r21, 191
-L1: dec  r21
-    brne L1
-    dec  r19
-    brne L1
-    dec  r18
-    brne L1
-    nop
-    ret
-
-\end{lstlisting}
+\avrasm{../src/a5.asm}{}
 \newpage
 
 \section{Assignment 6 - Johnson counter}
@@ -532,107 +301,5 @@ L1: dec  r21
 \end{figure}
 \newpage
 \subsection{Assembly Program}
-\begin{lstlisting}[basicstyle=\tiny]
-;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-;   1DT301, Computer Technology I
-;   Date: 2017-09-04
-;   Author:
-;                       Caroline Nilsson            (cn222nd)
-;                       Daniel Alm Grundstrom       (dg222dw)
-;
-;   Lab number:         1
-;   Title:              How to use the PORTs. Digital input /output.
-;                       Subroutine call.
-;
-;   Hardware:           STK600, CPU ATmega2560
-;
-;   Function:           Lights LEDs as a Johnson counter in an infinite loop. 
-;
-;                       I.e:
-;                       0000 0001 -> 0000 0011 -> 0000 0111 -> ...
-;                       1111 1111 -> 0111 1111 -> 0011 1111 -> ...
-;
-;   Input ports:        N/A
-;
-;   Output ports:       PORTB
-;
-;   Subroutines:        count_up - Counts the Johnson counter up
-;                       count_down - Counts the Johnson counter down
-;                       delay_500ms - delay execution for 500 ms
-;
-;   Included files:     m2560def.inc
-;
-;   Other information:  N/A
-;
-;   Changes in program: 
-;                       2017-09-02:
-;                       Implements flowchart design
-;
-;                       2017-09-04:
-;                       Adds header and comments
-;
-;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-.include "m2560def.inc"
-.def dataDir = r16
-.def currentValue = r17                 ; Current value of Johnson counter
-.def multiplier = r18
-
-; Initialize SP, Stack Pointer
-ldi r20, HIGH(RAMEND)                   ; R20 = high part of RAMEND address
-out SPH,R20                             ; SPH = high part of RAMEND address
-ldi R20, low(RAMEND)                    ; R20 = low part of RAMEND address
-out SPL,R20                             ; SPL = low part of RAMEND address
-
-ldi currentValue, 0x00
-ldi multiplier, 0x02
-
-; Set PORTB as output
-ldi dataDir, 0xFF
-out DDRB, dataDir
-
-count_up:
-    sbic PORTB, PORTB7                  ; If LED7 is lit (i.e. all LEDs lit)
-        rjmp count_down                 ;   then start counting down
-
-    ; Get next johnson value by multiplying by 2 and adding 1
-    mul currentValue, multiplier
-    mov currentValue, r0
-    inc currentValue
-
-    out PORTB, currentValue             ; Ouput johnson value to LEDs
-    rcall delay_500ms                   ; Delay to make changes visible
-    rjmp count_up                       ; Continue counting up
-
-count_down:
-    sbis PORTB, PORTB0                  ; If LED0 is unlit (i.e. all LEDs unlit)
-        rjmp count_up                   ;   then start counting up
-
-    lsr currentValue                    ; Shift to right to get previous
-                                        ; johnson value
-
-    out PORTB, currentValue             ; Output johnson value to LEDs
-    rcall delay_500ms                   ; Delay to make changes visible
-    rjmp count_down                     ; Continue counting down
-
-; Generated by delay loop calculator
-; at http://www.bretmulvey.com/avrdelay.html
-;
-; Delay 4 000 000 cycles
-; 500ms at 8.0 MHz
-delay_500ms:
-    ldi  r31, 21
-    ldi  r30, 75
-    ldi  r29, 191
-L1: dec  r29
-    brne L1
-    dec  r30
-    brne L1
-    dec  r31
-    brne L1
-    nop
-    ret
-
-\end{lstlisting}
-
-
+\avrasm{../src/a6.asm}{}
 \end{document}
