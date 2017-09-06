@@ -39,7 +39,7 @@
 .include "m2560def.inc"
 .def dataDir = r16
 .def ledState = r17
-.def INITIAL_LED_STATE = 0x01
+.equ INITIAL_LED_STATE = 0x01
 
 ; Initialize SP, Stack Pointer
 ldi r20, HIGH(RAMEND)                   ; R20 = high part of RAMEND address
@@ -54,13 +54,13 @@ out DDRB, dataDir
 ldi ledState, INITIAL_LED_STATE         ; Set initial LED state
 
 loop:
-    out PORTB, ledOutput                ; Write state to LEDs
+    out PORTB, ledState                ; Write state to LEDs
     rcall delay_500ms                   ; Delay to make changes visible
 
-    sbic PORTB, PORTB7                  ; If LED7 is lit
+    sbic PORTB, PINB7                  ; If LED7 is lit
         ldi ledState, INITIAL_LED_STATE ;    then reset LED state to initial
 
-    sbis PORTB, PORTB7                  ; else
+    sbis PORTB, PINB7                  ; else
         lsl ledState                    ;    shift LED state to the left 
     rjmp loop
 
@@ -70,14 +70,22 @@ loop:
 ; Delay 4 000 000 cycles
 ; 500ms at 8.0 MHz
 delay_500ms:
-    ldi  r18, 21
+    push r18
+	push r19
+	push r20
+	
+	ldi  r18, 21
     ldi  r19, 75
-    ldi  r21, 191
-L1: dec  r21
+    ldi  r20, 191
+L1: dec  r20
     brne L1
     dec  r19
     brne L1
     dec  r18
     brne L1
     nop
+	
+	pop r20
+	pop r19
+	pop r18
     ret

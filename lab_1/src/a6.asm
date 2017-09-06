@@ -21,9 +21,7 @@
 ;
 ;   Output ports:       PORTB
 ;
-;   Subroutines:        count_up - Counts the Johnson counter up
-;                       count_down - Counts the Johnson counter down
-;                       delay_500ms - delay execution for 500 ms
+;   Subroutines:        delay_500ms - delay execution for 500 ms
 ;
 ;   Included files:     m2560def.inc
 ;
@@ -56,7 +54,7 @@ ldi dataDir, 0xFF
 out DDRB, dataDir
 
 count_up:
-    sbic PORTB, PORTB7                  ; If LED7 is lit (i.e. all LEDs lit)
+    sbic PORTB, PINB7                  ; If LED7 is lit (i.e. all LEDs lit)
         rjmp count_down                 ;   then start counting down
 
     ; Get next johnson value by multiplying by 2 and adding 1
@@ -69,7 +67,7 @@ count_up:
     rjmp count_up                       ; Continue counting up
 
 count_down:
-    sbis PORTB, PORTB0                  ; If LED0 is unlit (i.e. all LEDs unlit)
+    sbis PORTB, PINB0                  ; If LED0 is unlit (i.e. all LEDs unlit)
         rjmp count_up                   ;   then start counting up
 
     lsr currentValue                    ; Shift to right to get previous
@@ -85,6 +83,10 @@ count_down:
 ; Delay 4 000 000 cycles
 ; 500ms at 8.0 MHz
 delay_500ms:
+    push r29
+	push r30
+	push r31
+	
     ldi  r31, 21
     ldi  r30, 75
     ldi  r29, 191
@@ -95,4 +97,8 @@ L1: dec  r29
     dec  r31
     brne L1
     nop
+	
+	pop r31
+	pop r30
+	pop r29
     ret
