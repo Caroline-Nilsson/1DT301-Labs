@@ -122,9 +122,7 @@
 \begin{algorithmic}
 \Procedure{Pseudocode}{}
 \State{$PortB = output$}
-\Repeat
 \State{$Led2\ bitstring \rightarrow PortB$}
-\Until{$\infty$}
 \EndProcedure
 \caption{Light LED2}
 \label{assign1.pseudo}
@@ -152,10 +150,9 @@
 \begin{algorithmic}
 \Procedure{Pseudocode}{}
 \State{$PortB = output$}
-\State{$PortD = input$}
+\State{$PortC = input$}
 \Repeat
-\State{$PortD\ value \rightarrow switchState$} \Comment{$switchState = register\ location$}
-\State{$Invert\ value\ at\ switchState$}
+\State{$PortC\ value \rightarrow switchState$} \Comment{$switchState = register\ location$}
 \State{$switchState \rightarrow PortB$}
 \Until{$\infty$}
 \EndProcedure
@@ -169,9 +166,10 @@
 \caption{Basic flow in order to read switches and light corresponding LED}
 \label{assign2.flow}
 \end{figure}
-\newpage
+
 
 \input{content/assignment_2_method.tex}
+\newpage
 
 \subsection{Assembly Program}
 \avrasm{../src/a2.asm}{}
@@ -185,9 +183,9 @@
 \begin{algorithmic}
 \Procedure{Pseudocode}{}
 \State{$PortB = output$}
-\State{$PortD = input$}
+\State{$PortC = input$}
 \Repeat
-\State{$clear\ ledState$} \Comment{$ledState = register\ location$}
+\State{$reset\ ledState$} \Comment{$ledState = register\ location$}
 \If{$Switch5\ is\ pressed$}
 \State{$ledState = LED0\ bit\ string$}
 \EndIf
@@ -204,9 +202,10 @@
 \caption{Flowchart}
 \label{}
 \end{figure}
-\newpage
+
 
 \input{content/assignment_3_method.tex}
+\newpage
 
 \subsection{Assembly Program}
 \avrasm{../src/a3.asm}{}
@@ -234,6 +233,7 @@
 
 \input{content/assignment_4_method.tex}
 
+
 \subsection{Assembly Program}
 \begin{lstlisting}
 
@@ -249,16 +249,11 @@
 \Procedure{Pseudocode}{}
 \State{$Initialize\ stack\ pointer$}
 \State{$PortB = output$}
-\State{$ledState = 1$} \Comment{$ledState = register\ location$}
+\State{$Initialize\ ledState$} \Comment{$ledState = register\ location$}
 \Repeat
 \State{$ledState \rightarrow PortB$}
-\State{$Delay\ 0.5\ sec$}
-\If{$LED7\ is\ lit$}
-\State{$ledState = 1$}
-\EndIf
-\If{$LED7\ is\ not\ lit$}
-\State{$Move\ to\ left$}
-\EndIf
+\State{$Delay$}
+\State{$rotate\ ledState\ to\ left$}
 \Until{$\infty$}
 \EndProcedure
 \caption{Waterfall simulation using LEDs}
@@ -271,9 +266,9 @@
 \caption{Flowchart}
 \label{}
 \end{figure}
-\newpage
 
 \input{content/assignment_5_method.tex}
+\newpage
 
 \subsection{Assembly Program}
 \avrasm{../src/a5.asm}{}
@@ -286,26 +281,28 @@
 \begin{algorithm}
 \begin{algorithmic}
 \Procedure{Pseudocode}{}
-\State{$PortB = output$}
-\State{$currentValue = 0$} \Comment{$currentValue = register\ location$}
-\State{$multiplier = 2$} \Comment{$multiplier = register\ location$}
+\State{$PortB = output$} \Comment{$complement = register\ location$}
+\State{$Initialize\ currentValue$} \Comment{$currentValue = register\ location$}
 \Repeat \Comment{$Loop\_1\ (count\ up)$}
 \If{$LED7\ is\ lit$}
 \State{$Continue\ at\ Loop\_2$}
 \Else
-\State{$currentValue \times multiplier \rightarrow currentValue$}
+\State{$ currentValue = currentValue \times 2$}
 \State{$Increase\ currentValue\ by\ 1$}
+\State{$complement = complement\ of\ currentValue$} 
 \EndIf
-\State{$currentValue \rightarrow PortB$}
-\State{$Delay\ 0.5\ sec$}
+\State{$complement \rightarrow PortB$}
+\State{$Delay$}
 \Until{$\infty$}
 \Repeat \Comment{$Loop\_2\ (count\ down)$}
 \If{$LED0\ is\ lit$}
 \State{$Continue\ at\ Loop\_1$}
 \Else
-\State{$Move\ right$}
+\State{$currentValue = Shift\ right$}
+\State{$complement = complement\ of\ currentValue$} 
 \EndIf
-\State{$currentValue \rightarrow PortB$}
+\State{$complement \rightarrow PortB$}
+\State{$Delay$}
 \Until{$\infty$}
 \EndProcedure
 \caption{Johnson counter simulation using LEDs}
@@ -318,9 +315,10 @@
 \caption{Flowchart}
 \label{}
 \end{figure}
-\newpage
 
 \input{content/assignment_6_method.tex}
+
+\clearpage
 
 \subsection{Assembly Program}
 \avrasm{../src/a6.asm}{}
