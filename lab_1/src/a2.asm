@@ -38,15 +38,15 @@
 ;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 .include "m2560def.inc"
 .def switchInput = r16
-.def ledOutput = r17
+.def dataDir = r17
 
 ; Set PORTB (LEDs) as output
-ldi switchInput, 0xFF
-out DDRB, switchInput
+ldi dataDir, 0xFF
+out DDRB, dataDir
 
 ; Set PORTC (switches) as input
-ldi ledOutput, 0x00
-out DDRC, ledOutput
+ldi dataDir, 0x00
+out DDRC, dataDir
 
 loop:
     in switchInput, PINC        ; Read input from switches
