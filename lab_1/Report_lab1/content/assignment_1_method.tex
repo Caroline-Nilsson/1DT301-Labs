@@ -1,0 +1,22 @@
+The pseudocode (see algorithm \ref{assign1.pseudo}) and the flowchart (see
+figure \ref{assign1.flow}) shows that we first set PORTB as an output port. To
+light up \texttt{LED2} we then only need to write a value to the bit on PORTB that
+corresponds to LED2. 
+
+We started with the assumption that all bits in PORTB would be zero when the
+LEDs where turned off and as such wrote a 1 to the third least significant bit 
+to light up LED2. When we tested the program on the hardware however, all LEDs
+except LED2 was turned on. If we understood this correctly, this was due to the
+pull-up resistor being activated on PORTB which made the LEDs light when their
+bit was 0 (as opposed to 1) on PORTB. We fixed this by simply inverting the 
+value we wrote to PORTB (${1111 1011}_2$ instead of ${0000 0100}_2$).
+
+The minimal number of lines required to write this program we think are 4 
+(unless there is some obscure trick). 2 lines are required to set the LED port
+as output: 1) write a value to a register and 2) write that value to the data
+direction register, and 2 lines for turning on the LED: 3) write the LED state
+to a register and 4) write the LED state to the output port. If the value
+written to the data direction register is reused when writing to the output
+port, the LED will not turn on because of the pull-up resistor will require
+that a zero is written to the bit corresponding to the LED that we want to
+light.
