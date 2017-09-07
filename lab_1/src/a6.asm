@@ -38,7 +38,7 @@
 .include "m2560def.inc"
 .def dataDir = r16
 .def currentValue = r17                 ; Current value of Johnson counter
-.def multiplier = r18
+.def complement = r18
 
 ; Initialize SP, Stack Pointer
 ldi r20, HIGH(RAMEND)                   ; R20 = high part of RAMEND address
@@ -47,33 +47,31 @@ ldi R20, low(RAMEND)                    ; R20 = low part of RAMEND address
 out SPL,R20                             ; SPL = low part of RAMEND address
 
 ldi currentValue, 0x00
-ldi multiplier, 0x02
-
+rcall led_out
 ; Set PORTB as output
 ldi dataDir, 0xFF
 out DDRB, dataDir
 
 count_up:
-    sbic PORTB, PINB7                  ; If LED7 is lit (i.e. all LEDs lit)
+    sbis PORTB, PINB7                  ; If LED7 is lit (i.e. all LEDs lit)
         rjmp count_down                 ;   then start counting down
 
     ; Get next johnson value by multiplying by 2 and adding 1
-    mul currentValue, multiplier
-    mov currentValue, r0
+    lsl currentValue
     inc currentValue
 
-    out PORTB, currentValue             ; Ouput johnson value to LEDs
+	rcall led_out
     rcall delay_500ms                   ; Delay to make changes visible
     rjmp count_up                       ; Continue counting up
 
 count_down:
-    sbis PORTB, PINB0                  ; If LED0 is unlit (i.e. all LEDs unlit)
+    sbic PORTB, PINB0                  ; If LED0 is unlit (i.e. all LEDs unlit)
         rjmp count_up                   ;   then start counting up
 
     lsr currentValue                    ; Shift to right to get previous
                                         ; johnson value
 
-    out PORTB, currentValue             ; Output johnson value to LEDs
+    rcall led_out
     rcall delay_500ms                   ; Delay to make changes visible
     rjmp count_down                     ; Continue counting down
 
@@ -87,18 +85,24 @@ delay_500ms:
 	push r30
 	push r31
 	
-    ldi  r31, 21
-    ldi  r30, 75
-    ldi  r29, 191
+    ldi  r31, 4
+    ldi  r30, 12
+    ldi  r29, 52
 L1: dec  r29
     brne L1
     dec  r30
     brne L1
     dec  r31
     brne L1
-    nop
+    rjmp PC+1
 	
 	pop r31
 	pop r30
 	pop r29
     ret
+
+led_out:
+	mov complement, currentValue
+	com complement
+	out PORTB, complement
+	ret

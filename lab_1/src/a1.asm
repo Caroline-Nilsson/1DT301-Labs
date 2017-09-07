@@ -34,10 +34,9 @@
 .def ledOutput = r16
 
 ; Set PORTB to output
-ldi ledOutput, PINB2
+ldi ledOutput, 0xFF
 out DDRB, ledOutput
 
-; TODO: Test on hardware if it is neccessary to have this in a loop
-loop:
-    out PORTB, ledOutput        ; Turn on LED2 on PORTB
-    rjmp loop
+ldi ledOutput, 0b1111_1011
+
+out PORTB, ledOutput        ; Turn on LED2 on PORTB

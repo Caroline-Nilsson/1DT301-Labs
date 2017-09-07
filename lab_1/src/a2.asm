@@ -15,7 +15,7 @@
 ;                       corresponding LED when a switch is pressed. (SW0 lights
 ;                       LED0, SW1 lights LED1 and so on)
 ;
-;   Input ports:        PORTD
+;   Input ports:        PORTC
 ;
 ;   Output ports:       PORTB
 ;
@@ -24,7 +24,7 @@
 ;
 ;   Other information:  Since a pressed switch is registered as a 0 and a
 ;                       released switch is registered as a 1. The bit string
-;                       read from PORTD must be inverted before the output
+;                       read from PORTC must be inverted before the output
 ;                       is redirected to the LEDs.
 ;
 ;   Changes in program: 
@@ -43,12 +43,11 @@
 ldi switchInput, 0xFF
 out DDRB, switchInput
 
-; Set PORTD (switches) as input
+; Set PORTC (switches) as input
 ldi ledOutput, 0x00
-out DDRD, ledOutput
+out DDRC, ledOutput
 
 loop:
-    in switchInput, PIND        ; Read input from switches
-    com switchInput             ; Invert input bit string
+    in switchInput, PINC        ; Read input from switches
     out PORTB, switchInput      ; Output inverted bit string to LEDs
     rjmp loop

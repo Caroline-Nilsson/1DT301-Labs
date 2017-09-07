@@ -39,16 +39,16 @@
 ldi dataDir, 0xFF
 out DDRB, dataDir
 
-; Set PortD as input
+; Set PortC as input
 ldi dataDir, 0x00
-out DDRD, dataDir
+out DDRC, dataDir
 
 loop:
-    clr ledState                    ; Clear LED state so LED is turned off when
+    ldi ledState, 0xFF              ; Clear LED state so LED is turned off when
                                     ; button is released
 
-    sbis PIND, PIND5                ; If SW5 is pressed down (PIND5 bit is zero)
-        ldi ledState, 0x01          ;   then set LED0 state to turned on
+    sbis PINC, PINC5                ; If SW5 is pressed down (PINC5 bit is zero)
+        ldi ledState, 0xFE          ;   then set LED0 state to turned on
 
     out PORTB, ledState             ; write state to LEDs
     rjmp loop
