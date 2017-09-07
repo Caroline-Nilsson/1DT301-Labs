@@ -65,7 +65,6 @@
     }
 }
 
-
 \title{	
 \vspace{-8cm}
 \begin{sidebar}
@@ -95,8 +94,6 @@
 }
 \date{\today} 
 
-
-
 \begin{document}
 
 \pagenumbering{gobble}
@@ -107,23 +104,19 @@
 \restoregeometry
 \clearpage
 
-
-
 \pagenumbering{gobble}
 
 \tableofcontents
 \newpage
 \pagenumbering{arabic}
 
-
-
 \section{Introduktion}
-In the process of working with the laboratory assignments we started by doing research about the assembly language and the STK600 in order to better understand how to solve the different assignments. 
-In each assignment we first created a pseudocode solution which we converted to flowchart diagrams, then it was rather simple to convert this into assembly language. Common for all assignments is also that we have been using the simulations to confirm that the program is working and completing the correct tasks. 
+\input{content/intro.tex}
 
 \newpage
 \section{Assignment 1 - Light LED2}
-In the first assignment we were to light up LED2 (which is the third light counting from the right). 
+
+\input{content/assignment_1_intro.tex}
 
 \begin{algorithm}
 \begin{algorithmic}
@@ -144,14 +137,17 @@ In the first assignment we were to light up LED2 (which is the third light count
 \label{assign1.flow}
 \end{figure}
 
-The pseudocode (see algorithm \ref{assign1.pseudo}) and the flowchart (see figure \ref{assign1.flow}) shows that we first set Port B as an output port, the value 0000 0100 is saved at a register location (in our case that is R16) and then sent to Port B which makes LED2 (or the third led from the right) light up. 
-Minimum lines of code?
+\input{content/assignment_1_method.tex}
+
 \newpage
 \subsection{Assembly Program}
 \avrasm{../src/a1.asm}{}
 \newpage
 
 \section{Assignment 2 - Switch light corresponding LED}
+
+\input{content/assignment_2_intro.tex}
+
 \begin{algorithm}
 \begin{algorithmic}
 \Procedure{Pseudocode}{}
@@ -174,11 +170,17 @@ Minimum lines of code?
 \label{assign2.flow}
 \end{figure}
 \newpage
+
+\input{content/assignment_2_method.tex}
+
 \subsection{Assembly Program}
 \avrasm{../src/a2.asm}{}
 \newpage
 
 \section{Assignment 3 - Swift5 lights LED0}
+
+\input{content/assignment_3_intro.tex}
+
 \begin{algorithm}
 \begin{algorithmic}
 \Procedure{Pseudocode}{}
@@ -203,11 +205,17 @@ Minimum lines of code?
 \label{}
 \end{figure}
 \newpage
+
+\input{content/assignment_3_method.tex}
+
 \subsection{Assembly Program}
 \avrasm{../src/a3.asm}{}
 \newpage
 
 \section{Assignment 4}
+
+\input{content/assignment_4_intro.tex}
+
 \begin{algorithm}
 \begin{algorithmic}
 \Procedure{Pseudocode}{}
@@ -224,6 +232,8 @@ Minimum lines of code?
 \label{}
 \end{figure}
 
+\input{content/assignment_4_method.tex}
+
 \subsection{Assembly Program}
 \begin{lstlisting}
 
@@ -231,6 +241,9 @@ Minimum lines of code?
 \newpage
 
 \section{Assignment 5 - Waterfall}
+
+\input{content/assignment_5_intro.tex}
+
 \begin{algorithm}
 \begin{algorithmic}
 \Procedure{Pseudocode}{}
@@ -259,11 +272,17 @@ Minimum lines of code?
 \label{}
 \end{figure}
 \newpage
+
+\input{content/assignment_5_method.tex}
+
 \subsection{Assembly Program}
 \avrasm{../src/a5.asm}{}
 \newpage
 
 \section{Assignment 6 - Johnson counter}
+
+\input{content/assignment_6_intro.tex}
+
 \begin{algorithm}
 \begin{algorithmic}
 \Procedure{Pseudocode}{}
@@ -300,6 +319,9 @@ Minimum lines of code?
 \label{}
 \end{figure}
 \newpage
+
+\input{content/assignment_6_method.tex}
+
 \subsection{Assembly Program}
 \avrasm{../src/a6.asm}{}
 \end{document}
