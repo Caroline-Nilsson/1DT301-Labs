@@ -1,6 +1,6 @@
 ;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 ;   1DT301, Computer Technology I
-;   Date: 2017-09-04
+;   Date: 2017-09-07
 ;   Author:
 ;                       Caroline Nilsson            (cn222nd)
 ;                       Daniel Alm Grundström       (dg222dw)
@@ -13,15 +13,14 @@
 ;
 ;   Function:           Turns on LED0 when SW5 is held down.
 ;
-;   Input ports:        PORTD
+;   Input ports:        PORTC
 ;
 ;   Output ports:       PORTB
 ;
 ;   Subroutines:        N/A
 ;   Included files:     m2560def.inc
 ;
-;   Other information:  As with assignment 2, we have to keep in mind that
-;                       a pressed switch is registered as a 0.
+;   Other information:  N/A
 ;
 ;   Changes in program: 
 ;                       2017-09-01:
@@ -29,6 +28,10 @@
 ;
 ;                       2017-09-04:
 ;                       Minor refactoring. Adds header and comments.
+;
+;                       2017-09-07:
+;                       Adjusts code to handle pull up resistor on PORTB.
+;                       Changes switch port to PORTC.
 ;
 ;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 .include "m2560def.inc"
@@ -44,8 +47,8 @@ ldi dataDir, 0x00
 out DDRC, dataDir
 
 loop:
-    ldi ledState, 0xFF              ; Clear LED state so LED is turned off when
-                                    ; button is released
+    ser ledState                    ; Set bits in LED state so LEDs are turned 
+                                    ; off when button is released
 
     sbis PINC, PINC5                ; If SW5 is pressed down (PINC5 bit is zero)
         ldi ledState, 0xFE          ;   then set LED0 state to turned on

@@ -1,6 +1,6 @@
 ;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 ;   1DT301, Computer Technology I
-;   Date: 2017-09-02
+;   Date: 2017-09-07
 ;   Author:
 ;                       Caroline Nilsson            (cn222nd)
 ;                       Daniel Alm Grundström       (dg222dw)
@@ -22,10 +22,7 @@
 ;   Subroutines:        N/A
 ;   Included files:     m2560def.inc
 ;
-;   Other information:  Since a pressed switch is registered as a 0 and a
-;                       released switch is registered as a 1. The bit string
-;                       read from PORTC must be inverted before the output
-;                       is redirected to the LEDs.
+;   Other information:  N/A
 ;
 ;   Changes in program: 
 ;                       2017-09-01:
@@ -33,6 +30,10 @@
 ;
 ;                       2017-09-02:
 ;                       Adds header and comments.
+;
+;                       2017-09-07:
+;                       Adjusts code to handle pull up resistor on PORTB.
+;                       Changes switch port to PORTC.
 ;
 ;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 .include "m2560def.inc"
@@ -49,5 +50,5 @@ out DDRC, ledOutput
 
 loop:
     in switchInput, PINC        ; Read input from switches
-    out PORTB, switchInput      ; Output inverted bit string to LEDs
+    out PORTB, switchInput      ; Output switch input to LEDs
     rjmp loop
