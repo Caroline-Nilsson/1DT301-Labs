@@ -1,0 +1,3 @@
+As with the previous assignment, we figured the first thing that needed to be done was to set the LED port, \texttt{PORTB}, as output and the switch port, \texttt{PORTC}, as input. In a loop, we then reset the value to write to the leds before checking if \texttt{SW5} is pressed down. If the switch is pressed down we clear the least significant bit in the LED output value to indicate that we want \texttt{LED0} to turn on before writing the value out to the LEDs.
+
+When testing on hardware we needed to adjust the code for the pull-up resistors on the LEDs to get it to work.
