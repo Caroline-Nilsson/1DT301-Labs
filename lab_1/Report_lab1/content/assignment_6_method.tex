@@ -1,0 +1,11 @@
+We started by trying to figure out the mathematical formula for finding Johnson values. In decimal, the values for an 8-bit Johnson counter are: 0, 1, 3, 7, 15, 31, 63, 127 and 255. We realized that we could get the next value by multiplying by 2 and adding 1, which gives the recurrence relation
+
+\begin{equation*}
+    J_n = J_{n-1} \cdot 2 + 1, \qquad n \in \mathbb{N}_0
+\end{equation*}
+
+With this we could get both the next and previous Johnson value. In the case of getting the previous value, we considered that we are dealing with integers, which because of truncating means we only needed to divide the current value by 2 to count down the counter.
+
+As with assignment 5, we start by setting the stack pointer since we are going to use a subroutine for the delay function. We also set \texttt{PORTB} as output. To count the Johnson counter up and down, we created two loops: \texttt{count\_up} and \texttt{count\_down}. In \texttt{count\_up} we multiply the current counter value by 2 by shifting it to the left and then increment it by 1 before outputting the value to the LEDs. We repeat this until all the LEDs are lit, upon which executions jumps to \texttt{count\_down}. In this loop, we divide the current counter value by 2 by shifting it to the right and then output the value to the LEDs. This is in turn repeated until all the LEDs are turned off, upon which the execution jumps back to \texttt{count\_up} and the process starts again.
+
+When testing the program on hardware, we had some problems with the pull-up resistor causing the LEDs to output inverse states. We figured the easiest way to solve this was to create a subroutine which gets the complement of the current Johnson value and outputs that to the LEDs.
