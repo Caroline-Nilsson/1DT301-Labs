@@ -2,7 +2,6 @@
 \usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
 \usepackage[T1]{fontenc}
 \usepackage{times}
-\usepackage[swedish]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage{wallpaper}
 \usepackage[absolute]{textpos}
@@ -14,6 +13,8 @@
 \usepackage{algorithm}
 \usepackage[noend]{algpseudocode}
 \usepackage{listings}
+\usepackage{amsmath}
+\usepackage{amsfonts}
 
 \definecolor{MyDarkGreen}{rgb}{0.0,0.4,0.0} % This is the color used for comments
 \lstloadlanguages{AVR}%
@@ -70,12 +71,12 @@
 \begin{sidebar}
     \vspace{5cm}
     \normalfont \normalsize
-    \Huge Rapport \\
+    \Huge Report \\
     \vspace{-1.3cm}
 \end{sidebar}
 \vspace{3cm}
 \begin{flushleft}
-    \huge Laboratory Report\\  
+    \huge Laboratory 1\\  
 \end{flushleft}
 \null
 \vfill
@@ -85,7 +86,7 @@
 \begin{flushleft} \large
 	\emph{Author:} Caroline Nilsson \\ Daniel Alm Grundström \\
 	%\emph{Handledare:} \\ 
-	\emph{Termin:} HT 2017\\ 
+	\emph{Term:} HT 2017\\ 
 	\emph{Course:} 1DT301 - Computer Technology I\\
 \end{flushleft}
 \end{minipage}
@@ -110,14 +111,15 @@
 \newpage
 \pagenumbering{arabic}
 
-\section{Introduktion}
+\section{Introduction}
 \input{content/intro.tex}
 
 \newpage
-\section{Assignment 1 - Light LED2}
 
+\section{Assignment 1 - Light LED2}
 \input{content/assignment_1_intro.tex}
 
+\subsection{Pseudo code}
 \begin{algorithm}
 \begin{algorithmic}
 \Procedure{Pseudocode}{}
@@ -129,12 +131,15 @@
 \end{algorithmic}
 \end{algorithm}
 
+\subsection{Flowchart}
 \begin{figure}[h]
+\centering
 \includegraphics[scale=0.5]{Flowchart_pics/assignment1_pic.png} 
 \caption{Flowchart}
 \label{assign1.flow}
 \end{figure}
 
+\subsection{Method}
 \input{content/assignment_1_method.tex}
 
 \newpage
@@ -143,9 +148,9 @@
 \newpage
 
 \section{Assignment 2 - Switch light corresponding LED}
-
 \input{content/assignment_2_intro.tex}
 
+\subsection{Pseudo code}
 \begin{algorithm}
 \begin{algorithmic}
 \Procedure{Pseudocode}{}
@@ -161,13 +166,15 @@
 \end{algorithmic}
 \end{algorithm}
 
+\subsection{Flowchart}
 \begin{figure}[h]
+\centering
 \includegraphics[scale=0.5]{Flowchart_pics/assignment2_pic.png} 
 \caption{Basic flow in order to read switches and light corresponding LED}
 \label{assign2.flow}
 \end{figure}
 
-
+\subsection{Method}
 \input{content/assignment_2_method.tex}
 \newpage
 
@@ -175,10 +182,10 @@
 \avrasm{../src/a2.asm}{}
 \newpage
 
-\section{Assignment 3 - Swift5 lights LED0}
-
+\section{Assignment 3 - Switch 5 lights LED0}
 \input{content/assignment_3_intro.tex}
 
+\subsection{Pseudo code}
 \begin{algorithm}
 \begin{algorithmic}
 \Procedure{Pseudocode}{}
@@ -197,13 +204,15 @@
 \end{algorithmic}
 \end{algorithm}
 
+\subsection{Flowchart}
 \begin{figure}[h]
+\centering
 \includegraphics[scale=0.5]{Flowchart_pics/assignment3_pic.png} 
 \caption{Flowchart}
 \label{}
 \end{figure}
 
-
+\subsection{Method}
 \input{content/assignment_3_method.tex}
 \newpage
 
@@ -211,39 +220,19 @@
 \avrasm{../src/a3.asm}{}
 \newpage
 
-\section{Assignment 4}
-
+\section{Assignment 4 - Using the AVR simulator}
 \input{content/assignment_4_intro.tex}
 
-\begin{algorithm}
-\begin{algorithmic}
-\Procedure{Pseudocode}{}
-\State{}
-\EndProcedure
-\caption{}
-\label{}
-\end{algorithmic}
-\end{algorithm}
-
-\begin{figure}[h]
-
-\caption{Flowchart}
-\label{}
-\end{figure}
-
+\subsection{Method}
 \input{content/assignment_4_method.tex}
-
-
-\subsection{Assembly Program}
-\begin{lstlisting}
-
-\end{lstlisting}
 \newpage
 
 \section{Assignment 5 - Waterfall}
 
+\subsection{Assignment description}
 \input{content/assignment_5_intro.tex}
 
+\subsection{Pseudo code}
 \begin{algorithm}
 \begin{algorithmic}
 \Procedure{Pseudocode}{}
@@ -261,12 +250,16 @@
 \end{algorithmic}
 \end{algorithm}
 
+\subsection{Flowchart}
 \begin{figure}[h]
+\centering
 \includegraphics[scale=0.5]{Flowchart_pics/assignment5_pic.png} 
 \caption{Flowchart}
 \label{}
 \end{figure}
 
+\newpage
+\subsection{Method}
 \input{content/assignment_5_method.tex}
 \newpage
 
@@ -275,9 +268,9 @@
 \newpage
 
 \section{Assignment 6 - Johnson counter}
-
 \input{content/assignment_6_intro.tex}
 
+\subsection{Pseudo code}
 \begin{algorithm}
 \begin{algorithmic}
 \Procedure{Pseudocode}{}
@@ -310,15 +303,18 @@
 \end{algorithmic}
 \end{algorithm}
 
+\newpage
+
+\subsection{Flowchart}
 \begin{figure}[h!]
+\centering
 \includegraphics[scale=0.5]{Flowchart_pics/assignment6_pic.png} 
 \caption{Flowchart}
 \label{}
 \end{figure}
 
+\subsection{Method}
 \input{content/assignment_6_method.tex}
-
-\clearpage
 
 \subsection{Assembly Program}
 \avrasm{../src/a6.asm}{}
