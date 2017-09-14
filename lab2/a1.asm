@@ -4,6 +4,10 @@
 .def counter = r17
 .def loopCounter = r19
 .def dataDir = r18
+.def johnUpOrDown = r22
+.def complement = r23
+.equ UP = 0x01
+.equ DOWN = 0x00
 
 ldi r18, HIGH(RAMEND) 
 out SPH, r18
@@ -18,38 +22,70 @@ out DDRC, dataDir
 
 ldi displayMode, 0x00
 ldi counter, 0x01
+ldi johnUpOrDown, UP
 
 main_loop:
 	
-	cpse displayMode, 0xFF
-	rcall johnson_counter
+	cpi displayMode, 0x00
+	breq johnson
+
+	cpi displayMode, 0xFF
+	breq ring
 	
-	cpse displayMode, 0x00
-	rcall ring_counter
-	
+	johnson:
+		rcall johnson_counter
+		rjmp main_loop
+
+	ring:
+		rcall ring_counter
+
 	rjmp main_loop
 	
 ring_counter:
-	out PORTB, counter
+	mov complement, counter
+	com complement
+	out PORTB, complement
 	rcall delay_led
-	rol counter
+
+	cpi displayMode, 0x00
+	breq ring_end
+	
+	sbis PORTB, PINB7
+		ldi counter, 0x01
+
+	sbic PORTB, PINB7
+		lsl counter
+
+	ring_end:
 	ret
 	
 johnson_counter:
-	out PORTB, counter
+	mov complement, counter
+	com complement
+	out PORTB, complement
 	rcall delay_led
 	
-	sbis PORTB, PINB7
-	rjmp count_up
+	cpi displayMode, 0xFF
+	breq end
+
+	cpi johnUpOrDown, UP
+	breq count_up
 	
 	rjmp count_down
 	
 	count_up:
+		sbis PORTB, PINB7
+			rjmp count_down
+
+		ldi johnUpOrDown, UP
 		lsl counter
 		inc counter
 		rjmp end
 	 	
 	count_down:
+		sbic PORTB, PINB0
+			rjmp count_up
+		ldi johnUpOrDown, DOWN
 		lsr counter
 
 	end:
@@ -59,43 +95,49 @@ delay_led:
 	ldi loopCounter, 50
 	
 	loop_led:
-	    ldi  r20, 3
-	    ldi  r21, 152
-	L1: dec  r21
-	    brne L1
-	    dec  r20
-	    brne L1
-	    nop
+    ldi  r31, 13
+    ldi  r30, 252
+L1: dec  r30
+    brne L1
+    dec  r31
+    brne L1
+    nop
+
+
 		
-		sbis PORTC, PINC0
+		sbis PINC, PINC0
 		rcall delay_switch
 		
-		sbrs loopCounter, 0x00
-		ret
-		dec loopCaounter
+		cpi loopCounter, 0
+		breq delay_led_end
+		
+		dec loopCounter
 		
 		rjmp loop_led
 		
+	delay_led_end:
+		ret
+
 delay_switch:
     ldi  r20, 13
     ldi  r21, 252
-L1: dec  r21
-    brne L1
+L2: dec  r21
+    brne L2
     dec  r20
-    brne L1
+    brne L2
     nop
 	
 	loop_switch:
-		sbic PORTC, PINC0
+		sbis PINC, PINC0
 		rjmp loop_switch
 		
-		cpse displayMode, 0xFF
-		rjmp johnson_to_ring
+		cpi displayMode, 0x00
+		breq johnson_to_ring
 	
-		cpse displayMode, 0x00
-		rjmp ring_to_johnson
+		cpi displayMode, 0xFF
+		breq ring_to_johnson
 		
-		ring_to_jhonson:
+		ring_to_johnson:
 			lsl counter
 			dec counter
 			
