@@ -10,29 +10,28 @@ ldi r16, LOW(RAMEND)
 out SPL, r16
 
 ldi dataDir, 0xFF
-out PORTB, dataDir
+out DDRB, dataDir
 
 ldi dataDir, 0x00
-out PORTC, dataDir
+out DDRC, dataDir
 
 loop:
 	
-	sbis PORTC, PINC0
+	sbis PINC, PINC0
 		rcall generate_value
-	
-	sbic PORTC, PINC0
-		rcall set_led_state
-	
+
 	rjmp loop
 	
 generate_value:
-    ldi  r20, 13
-    ldi  r21, 252
-L1: dec  r21
-    brne L1
-    dec  r20
-    brne L1
-    nop
+
+	start:
+;    ldi  r20, 13
+;    ldi  r21, 252
+;L1: dec  r21
+;    brne L1
+;    dec  r20
+;    brne L1
+;    nop
 	
 	inc randomValue
 	cpi randomValue, 6
@@ -42,7 +41,11 @@ L1: dec  r21
 	reset_value:
 		ldi randomValue, 0
 		
-	end:
+	end:	
+		sbis PINC, PINC0
+			rjmp start
+		
+		rcall set_led_state
 		ret
 	
 set_led_state:
