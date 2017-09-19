@@ -42,9 +42,10 @@
 .include "m2560def.inc"
 .def dataDir = r16
 .def ledState = r17
+.def complement = r18
 .def waitH = r25
 .def waitL = r24
-.equ INITIAL_LED_STATE = 0xFF
+.equ INITIAL_LED_STATE = 0x01
 
 
 ; Initialize SP, Stack Pointer
@@ -59,16 +60,23 @@ out DDRB, dataDir
 
 ldi ledState, INITIAL_LED_STATE         ; Set initial LED state
 
-loop:
-    out PORTB, ledState                 ; Write state to LEDs
-    ldi waitH, HIGH(500)
-	ldi waitL, LOW(500)
+loop1:
+	mov complement, ledState
+	com complement
+    out PORTB, complement                 ; Write state to LEDs
+
+    ldi waitH, HIGH(1000)
+	ldi waitL, LOW(1000)
 	rcall wait_milliseconds             ; Delay to make changes visible
-    rol ledState                        ; Rotate LED state to the left 
-    rjmp loop
+
+    sbis PORTB, PINB7
+		ldi ledstate, INITIAL_LED_STATE
+	sbic PORTB, PINB7
+		lsl ledState                        ; Rotate LED state to the left 
+    rjmp loop1
 
 wait_milliseconds:
-	loop:
+	loop2:
 		cpi waitL, 0x00
 		breq low_zero
 		rjmp wait
@@ -84,12 +92,12 @@ wait_milliseconds:
 	wait:
 		sbiw waitH:waitL, 0x01
 	    
-		ldi  r18, 2
+		ldi  r20, 2
 	    ldi  r19, 74
 	L1: dec  r19
 	    brne L1
-	    dec  r18
+	    dec  r20
 	    brne L1
 	    rjmp PC+1
 		
-	    rjmp loop
+	    rjmp loop2

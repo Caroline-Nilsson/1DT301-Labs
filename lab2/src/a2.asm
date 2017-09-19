@@ -42,6 +42,7 @@
 .def dataDir = r16
 .def randomValue = r17
 .def ledState = r18
+.def complement = r19
 
 .equ LED_DICE_1 = 0b0001_0000
 .equ LED_DICE_2 = 0b0100_0100
@@ -61,20 +62,28 @@ out DDRB, dataDir
 ldi dataDir, 0x00
 out DDRC, dataDir
 
+ldi complement, 0xFF
+out PORTB, complement
+
 loop:
 	sbic PINC, PINC0                    ;Wait until switch is pressed down
         rjmp loop
 	
     rcall generate_value
 	rcall set_led_state
-	out PORTB, ledState
+	mov complement, ledState
+	com complement
+	out PORTB, complement
 
 	rjmp loop
 	
 ;Generate a pseudorandom value by repeatedly incrementing a counter for as long
 ;as the switch is pressed down
 generate_value:
+	ldi ledState, 0xFF					;Reset LEDs
+	out PORTB, ledState
 	start:
+		
         rcall delay_switch              ;Delay to avoid bouncing effects
 
         inc randomValue

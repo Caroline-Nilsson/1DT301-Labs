@@ -79,17 +79,14 @@ ldi counter, 0x01
 ldi johnUpOrDown, UP
 
 main_loop:
-    rcall led_out
-	rcall delay_led
-	
 	cpi displayMode, JOHNSON			;if displaymode = johnson
-	    breq johnson					;then jump to johnson branch
+	    breq johnson1					;then jump to johnson branch
 
-    ring:                               ;else jump to ring
+    ring1:                               ;else jump to ring
 	    rcall ring_counter              
         rjmp main_loop
 	
-	johnson:
+	johnson1:
 		rcall johnson_counter
 
 	rjmp main_loop
@@ -125,7 +122,10 @@ ring_counter:
 		ldi counter, 0x01				;then set counter to one
 
 	sbic PORTB, PINB7					;else
-		lsl counter						;shift counter to the left
+		lsl counter
+								;shift counter to the left
+	rcall led_out
+	rcall delay_led
 
 	ret
 	
@@ -145,7 +145,9 @@ johnson_counter:
 
 		ldi johnUpOrDown, UP			
 		lsl counter						;shift to the left
-		inc counter						;add one
+		inc counter
+										;add one
+		
 		rjmp end
 	 	
 	;checks whether to continue to count down and
@@ -155,9 +157,13 @@ johnson_counter:
 			rjmp count_up				;then jump to count up
 
 		ldi johnUpOrDown, DOWN			
-		lsr counter						;shift to the right
+		lsr counter	
+							;shift to the right
 
 	end:
+		rcall led_out
+		rcall delay_led
+		
 		ret
 
 
@@ -191,6 +197,7 @@ on_switch_pressed:
 		
 	;convert ring value to johnson value
 	ring_to_johnson:
+			
 		lsl counter
 		dec counter
 			
@@ -202,7 +209,9 @@ on_switch_pressed:
 		inc counter
 			
 	switch_end:
-		com displayMode					;toogle displaymode between ring and johnson
+		com displayMode
+		rcall led_out
+									;toogle displaymode between ring and johnson
     ret
 
 ;Delay for 2 ms

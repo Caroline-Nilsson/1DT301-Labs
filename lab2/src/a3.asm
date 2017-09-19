@@ -59,6 +59,7 @@ ldi dataDir, 0x00
 out DDRC, dataDir
 
 ldi counter, 0x00
+rcall led_out
 
 main_loop:
     rcall wait_for_switch_press
@@ -72,7 +73,7 @@ main_loop:
 ;Pauses execution of program until SW0 is pressed down
 wait_for_switch_press:
     loop:
-        sbis PINC, PINC0                ;If SW0 is not pressed down
+        sbic PINC, PINC0                ;If SW0 is not pressed down
             rjmp loop                   ;   then continue waiting
     ret                                 ;return when SW0 gets pressed down
 
@@ -86,7 +87,7 @@ on_switch_down:
 ;Pauses execution of program until SW0 is released
 wait_for_switch_release:
 	loop_2:
-	    sbic PINC, PINC0                ;If SW0 is still pressed down
+	    sbis PINC, PINC0                ;If SW0 is still pressed down
 		    rjmp loop_2                 ;   then continue waiting
     ret                                 ;return when SW0 gets released
 
