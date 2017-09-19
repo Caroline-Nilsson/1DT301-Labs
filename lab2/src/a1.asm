@@ -210,6 +210,7 @@ on_switch_pressed:
 			
 	switch_end:
 		com displayMode
+		;TODO: needed? rcall led_out
 		rcall led_out
 									;toogle displaymode between ring and johnson
     ret
