@@ -34,7 +34,8 @@
 ;                       Implements flowchart design.
 ;
 ;                       2017-09-19:
-;                       Adds constants for LED dice states and comments.
+;                       Adds constants for LED dice states and comments. Adds
+;                       outputting of complement to make the correct LEDs light
 ;
 ;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 .include "m2560def.inc"

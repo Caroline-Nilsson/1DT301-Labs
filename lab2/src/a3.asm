@@ -20,13 +20,18 @@
 ;
 ;   Output ports:       PORTB
 ;
-;   Subroutines:        wait_for_switch_press   - Delays execution of the 
-;                                                 Program until SW0 is press
-;                       on_switch_down          -
-;                       wait_for_switch_release -
-;                       on_switch_up            -
-;                       led_out                 -
-;                       delay_switch            -   
+;   Subroutines:        wait_for_switch_press   - Delays execution until SW0 is
+;                                                 pressed.
+;                       on_switch_down          - Handles what should happen
+;                                               - when SW0 gets pressed.
+;                       wait_for_switch_release - Delays execution until SW0 is
+;                                                 released.
+;                       on_switch_up            - Handles what should happen
+;                                                 when SW0 gets released.
+;                       led_out                 - Ouputs complement of counter
+;                                                 to LEDs.
+;                       delay_switch            - Delay 10 ms to avoid effects
+;                                                 of bouncing.
 ;
 ;   Included files:     m2560def.inc
 ;

@@ -42,7 +42,9 @@
 ;
 ;                       2017-09-19:
 ;                       Refactors code by breaking down large subroutines
-;                       into smaller subroutines.
+;                       into smaller subroutines. Fixes bug that caused
+;                       counter to display wrong value when toggling display
+;                       mode.
 ;
 ;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 .include "m2560def.inc"
