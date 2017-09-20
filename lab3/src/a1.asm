@@ -36,13 +36,13 @@
 
 .cseg
 
-.org 0
+.org 0x00
 rjmp reset
 
 .org int0addr
 rjmp interrupt
 
-.org 0xF0 ;?
+.org 0x72 ;?
 reset: 
 	ldi dataDir, LOW(RAMEND)
 	out SPL, dataDir
@@ -59,9 +59,9 @@ reset:
 	ldi xorComparison, XOR_BIT_STRING
 	
 	ldi dataDir, (1<<int0)
-	out GIMSK, dataDir
-	ldi dataDir, (2<<ICS00) 
-	out MCUCR, dataDir
+	out EIMSK, dataDir
+	ldi dataDir, (2<<ISC00)  
+	sts EICRA, dataDir
 	
 	sei
 	
@@ -78,7 +78,8 @@ main_loop:
 ;----------------------------------------------------------------------
 
 interrupt:
-	rcall delay
+	;rcall delay
+	nop
 
 wait_release:
 	sbis PIND, PIND0
