@@ -162,7 +162,7 @@ johnson_counter:
 
 	end:
 		rcall led_out
-		rcall delay_led
+		;rcall delay_led
 		
 		ret
 
@@ -180,7 +180,7 @@ L2: dec  r30
 	ret
 
 interrupt:
-	delay_switch
+	rcall delay_switch
 	
 	switch_release:
 	sbis PIND, SWITCH
@@ -204,5 +204,7 @@ interrupt:
 		com displayMode
 		
 
-    reti
+    pop dataDir
+	sei
+	rjmp main_loop
 		
