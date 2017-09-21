@@ -42,7 +42,7 @@ rjmp reset
 .org int0addr
 rjmp interrupt
 
-.org 0x72 ;?
+.org 0x72 
 reset: 
 	ldi dataDir, LOW(RAMEND)
 	out SPL, dataDir
@@ -60,7 +60,7 @@ reset:
 	
 	ldi dataDir, (1<<int0)
 	out EIMSK, dataDir
-	ldi dataDir, (2<<ISC00)  
+	ldi dataDir, (3<<ISC00)  
 	sts EICRA, dataDir
 	
 	sei
@@ -71,6 +71,7 @@ reset:
 
 main_loop:
 	out PORTB, ledState
+
 	rjmp main_loop
 
 ;----------------------------------------------------------------------
@@ -78,33 +79,21 @@ main_loop:
 ;----------------------------------------------------------------------
 
 interrupt:
-	;rcall delay
-	nop
-
-wait_release:
-	sbis PIND, PIND0
-		rjmp wait_release
-	
 	eor ledState, xorComparison
-	
-	reti
-	
+	rcall delay
+	reti	
 ;----------------------------------------------------------------------
 ;
 ;----------------------------------------------------------------------	
 delay:
-	push ledState
-	push xorComparison
-	
-    ldi  r18, 13
-    ldi  r19, 252
-L1: dec  r19
+    ldi  r30, 2
+    ldi  r19, 4
+    ldi  r20, 187
+L1: dec  r20
     brne L1
-    dec  r18
+    dec  r19
+    brne L1
+    dec  r30
     brne L1
     nop
-	
-	pop xorComparison
-	pop ledState
-	
 	ret

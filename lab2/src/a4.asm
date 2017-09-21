@@ -58,8 +58,8 @@ loop1:
 	com complement
     out PORTB, complement               ;Write complement of LED state to LEDs
 
-    ldi waitH, HIGH(1000)
-	ldi waitL, LOW(1000)
+    ldi waitH, HIGH(100)
+	ldi waitL, LOW(100)
 	rcall wait_milliseconds             ;Delay to make changes visible
 
     sbis PORTB, PINB7                   ;If leftmost LED is lit

@@ -162,7 +162,7 @@ johnson_counter:
 
 	end:
 		rcall led_out
-		;rcall delay_led
+		rcall delay_led
 		
 		ret
 
@@ -184,7 +184,7 @@ interrupt:
 	
 	switch_release:
 	sbis PIND, SWITCH
-	rjmp switch_release
+		rjmp switch_release
 	
 	cpi displayMode, JOHNSON
 	breq johnson_to_ring
@@ -192,6 +192,8 @@ interrupt:
 	ring_to_johnson:	
 		lsl counter
 		dec counter
+		rcall led_out
+		rcall delay_led
 			
 		rjmp switch_end
 	
@@ -203,6 +205,7 @@ interrupt:
 	switch_end:
 		com displayMode
 		
+	
 
     pop dataDir
 	sei

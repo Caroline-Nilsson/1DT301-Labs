@@ -71,7 +71,7 @@ clr lightStatus
 
 ldi dataDir, (3<<int0)
 out EIMSK, dataDir
-ldi dataDir, (2<<ISC00)|(2<<ISC10)
+ldi dataDir, (1<<ISC00)|(1<<ISC10)
 sts EICRA, dataDir
 sei
 
@@ -124,17 +124,33 @@ led_out:
 	ret
 
 delay_led:
+	ldi  r31, 3
+    ldi  r30, 138
+    ldi  r29, 86
+L1: dec  r29
+    brne L1
+    dec  r30
+    brne L1
+    dec  r31
+    brne L1
+    rjmp PC+1
 	ret
 
 delay_switch:
+	ldi  r30, 130
+    ldi  r29, 222
+L2: dec  r29
+    brne L2
+    dec  r30
+    brne L2
+    nop
 	ret
 
 interrupt_right:
 	rcall delay_switch
 
-	wait_released_right:
-		sbis PIND, PIND0
-		rjmp wait_released_right
+	sbrc lightStatus, TURN_LEFT
+		reti
 
 	cbr lightStatus, 0b1000_0000
 	ldi xorComparison, 0b0000_0001
@@ -145,9 +161,8 @@ interrupt_right:
 interrupt_left:
 	rcall delay_switch
 
-	wait_released_left:
-		sbis PIND, PIND1
-		rjmp wait_released_left
+	sbrc lightStatus, TURN_RIGHT
+		reti
 
 	cbr lightStatus, 0b0000_0001
 	ldi xorComparison, 0b1000_0000
