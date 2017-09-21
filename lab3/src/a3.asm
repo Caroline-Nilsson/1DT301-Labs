@@ -76,6 +76,8 @@ sts EICRA, dataDir
 sei
 
 main_loop:
+	clr ledState
+
 	sbrs lightStatus, TURN_LEFT
 		sbr ledState, 0b1100_0000
 
