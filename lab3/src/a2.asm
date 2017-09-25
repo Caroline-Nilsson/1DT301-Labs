@@ -1,27 +1,44 @@
 ;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 ;   1DT301, Computer Technology I
-;   Date: YYYY-MM-DD
+;   Date: 2017-09-25
 ;   Author:
 ;                       Caroline Nilsson            (cn222nd)
 ;                       Daniel Alm Grundström       (dg222dw)
 ;
-;   Lab number:         
-;   Title:              
+;   Lab number:         3
+;   Title:              Interrupts
 ;
 ;   Hardware:           STK600, CPU ATmega2560
 ;
-;   Function:           
+;   Function:           Counts up a counter and display it's value as either a 
+;                       Ring counter or Johnson counter. The display mode can 
+;                       be toggled between ring/johnson by pressing switch SW0.
 ;
-;   Input ports:        
+;   Input ports:        PORTD
 ;
-;   Output ports:       
+;   Output ports:       PORTB
 ;
-;   Subroutines:        
+;   Subroutines:        led_out           - Outputs counter to LEDs
+;                       delay_led         - Delay to make changes to LEDs 
+;                                           visible. Also continuously checks 
+;                                           if switch is pressed.
+;                       ring_counter      - Counts up ring counter
+;                       johnson_counter   - Counts johnson counter up/down
+;                       delay_switch      - Delay of 10 ms used after switch is
+;                                           pressed down
 ;   Included files:     m2560def.inc
 ;
-;   Other information:  
+;   Other information:  N/A
 ;
-;   Changes in program: 
+;   Changes in program: 2017-09-20
+;						Implementation of flowchart design
+;
+;						2017-09-21
+;						Bugfixes during laboratory
+;
+;						2017-09-25
+;						Overview code and commentary,
+;                       missing commentary added
 ;                       
 ;
 ;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -30,7 +47,7 @@
 
 .def displayMode = r16					;determines whether to output ring or johnson
 .def counter = r17						;keeps track of output value
-.def dataDir = r18						;use to set input and output on PORTs
+.def temp = r18							;use to set input and output on PORTs
 .def johnUpOrDown = r20					;whether to count johnson value up or down
 .def complement = r21					;temp, to output counters complement
 .equ UP = 0x01							;constant: value of up
@@ -41,46 +58,71 @@
 
 .cseg
 
+;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+; initialize starting point for program
+;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 .org 0x00
 rjmp start
 
+;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+; initialize interrupt start
+;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 .org int0addr
 rjmp interrupt
 
 .org 0x72
 
 start:
-;Initialize stack pointer
+;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+; initialize Stack Pointer
+;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 ldi r18, HIGH(RAMEND) 
 out SPH, r18
 ldi r18, LOW(RAMEND) 
 out SPL, r18
 
-;set PORTB to output
-ldi dataDir, 0xFF
-out DDRB, dataDir
+;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+; set PORTB to output
+;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+ldi temp, 0xFF
+out DDRB, temp
 
-;set PORTD to input
-ldi dataDir, 0x00
-out DDRD, dataDir
+;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+; set PORTD to input
+;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+ldi temp, 0x00
+out DDRD, temp
 
-;initialize starting state
+;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+; initialize starting state
+;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 ldi displayMode, JOHNSON
 ldi counter, 0x01
 ldi johnUpOrDown, UP
 
-ldi dataDir, (1<<int0)
-out EIMSK, dataDir
-ldi dataDir, (2<<ISC00)
-sts EICRA, dataDir
+;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+; enable external interrupt on PIND0
+;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+ldi temp, (1<<int0)
+out EIMSK, temp
+
+;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+; set interrupt sence control to "falling edge"
+;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+ldi temp, (2<<ISC00)
+sts EICRA, temp
 
 sei
 
+;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+; calls Ring/Johnson counter subrutine depending on
+; the state of displayMode 
+;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 main_loop:
 	cpi displayMode, JOHNSON			;if displaymode = johnson
 	    breq johnson1					;then jump to johnson branch
 
-    ring1:                               ;else jump to ring
+    ring1:                              ;else jump to ring
 	    rcall ring_counter              
         rjmp main_loop
 	
@@ -89,14 +131,20 @@ main_loop:
 
 	rjmp main_loop
 
-;Outputs complement of the current value of counter to LEDs
+
+;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+; Outputs complement of the current value of counter to LEDs
+;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 led_out:
     mov complement, counter
     com complement
     out PORTB, complement
     ret
 
-;Delay with continuous switch checking	
+
+;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+; Delay to show LED output
+;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 delay_led:
 	push johnUpOrDown
 	
@@ -115,30 +163,37 @@ L1: dec  r20
 
 	ret
 
-;Creates the ring counter by writing the complement of counter
-;to PORTB and then increments the ring counter
+;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+; Creates the ring counter by writing the complement of counter
+; to PORTB and then increments the ring counter 
+;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 ring_counter:
 	sbis PORTB, PINB7					;if the 7th led is lit
 		ldi counter, 0x01				;then set counter to one
 
 	sbic PORTB, PINB7					;else
-		lsl counter
-								;shift counter to the left
+		lsl counter						;shift counter to the left
+
 	rcall led_out
 	rcall delay_led
 
 	ret
 	
-;Creates the johnson counter by writing the complement of counter 
-;to PORTB and then checks wheter to count up or down
+
+;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+; Creates the johnson counter by writing the complement of counter 
+; to PORTB and then checks wheter to count up or down
+;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 johnson_counter:
 	cpi johnUpOrDown, UP				;if count up is active
 	breq count_up						;then jump to count up
 	
 	rjmp count_down						;else jump to count down
 	
-	;checks whether to continue to count up and 
-	;increments the johnson value
+	;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+	; checks whether to continue to count up and 
+	; increments the johnson value 
+	;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	count_up:
 		sbis PORTB, PINB7				;if the 7th led is lit
 			rjmp count_down				;then jump to count down
@@ -150,15 +205,16 @@ johnson_counter:
 		
 		rjmp end
 	 	
-	;checks whether to continue to count down and
-	;decrese the johnson value
+	;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+	; checks whether to continue to count down and
+	; decrese the johnson value
+	;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	count_down:
-		sbic PORTB, PINB0				;if the right most led is not lit
-			rjmp count_up				;then jump to count up
+		sbic PORTB, PINB0				;if the right most led is not 
+			rjmp count_up				;lit then jump to count up
 
 		ldi johnUpOrDown, DOWN			
-		lsr counter	
-							;shift to the right
+		lsr counter						;shift to the right
 
 	end:
 		rcall led_out
@@ -167,7 +223,10 @@ johnson_counter:
 		ret
 
 
-;Delay 10 ms to avoid bouncing when switch is pressed
+
+;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+; Delay 10 ms to avoid bouncing when switch is pressed
+;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 delay_switch:
     ldi  r31, 13
     ldi  r30, 252
@@ -179,9 +238,17 @@ L2: dec  r30
 
 	ret
 
+;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+; interrupt start
+; calls delay to avoid bouncing
+;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 interrupt:
 	rcall delay_switch
 	
+	;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+	; wait until switch is released then branch depending
+	; on display mode
+	;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	switch_release:
 	sbis PIND, SWITCH
 		rjmp switch_release
@@ -189,6 +256,10 @@ interrupt:
 	cpi displayMode, JOHNSON
 	breq johnson_to_ring
 	
+	;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+	; convert ring value to johnson value 
+	; call LED output and delay
+	;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	ring_to_johnson:	
 		lsl counter
 		dec counter
@@ -197,17 +268,23 @@ interrupt:
 			
 		rjmp switch_end
 	
-	;convert johnson value to ring value
+	
+	;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+	; convert johnson value to ring value
+	;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	johnson_to_ring:
 		lsr counter
 		inc counter
-			
+		
+	;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+	; toogle displayMode and remove PC from Stack, set interruption
+	; flag and jump to main_loop
+	; (this is done to avoid that the program resumes at the wrong
+	; counter after an interrupt)
+	;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<	
 	switch_end:
 		com displayMode
-		
-	
-
-    pop dataDir
-	sei
-	rjmp main_loop
+   	 	pop temp
+		sei
+		rjmp main_loop
 		
