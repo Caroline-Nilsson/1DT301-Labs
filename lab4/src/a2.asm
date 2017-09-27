@@ -21,7 +21,7 @@
 ;
 ;   Other information:  
 ;
-;   Changes in program: 2017-09-27
+;   Changes in program: 2017-09-26
 ;                       Implements flowchart design.
 ;                       
 ;
