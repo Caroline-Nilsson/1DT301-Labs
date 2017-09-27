@@ -180,7 +180,7 @@ blink_right:
 	or ledState, counter
 	lsr counter
 	cpi counter, 1
-	brge end_right						;if counter ≥1 jump to
+	brge end_right						;if counter >=1 jump to
 										;end_right
 
 	ldi counter, COUNTER_RIGHT_RESET	;else reset counter to
