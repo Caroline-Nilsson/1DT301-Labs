@@ -77,11 +77,11 @@ main_loop:
 	rjmp main_loop
 	
 interrupt:
-	:save Status Register in Stack
+	;save Status Register in Stack
 	in temp, sreg
 	push temp
 	
-	:set start value for timer
+	;set start value for timer
 	ldi temp, INIT_TIMER_VALUE	
 	out TNCT0, temp
 	
