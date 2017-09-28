@@ -27,7 +27,7 @@
 ;
 ;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-.inc "m2560def.inc"
+.include "m2560def.inc"
 
 .def temp = r16
 .def ledState = r17
@@ -44,14 +44,11 @@
 .org 0x00
 rjmp reset
 
-.org URXC0addr 
+.org URXC1addr 
 rjmp data_received_interrupt
 
-.org UDRE0addr
+.org UDRE1addr
 rjmp buffer_empty_interrupt
-
-.org UTXC0addr
-rjmp data_transmitted_interrupt
 
 .org 0x72
 ;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -76,14 +73,14 @@ out DDRB, temp
 ; Initialize Serial Communication
 ;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 ldi temp, TRANSFER_RATE
-sts UBRR0L, temp			;set transfer rate
+sts UBRR1L, temp			;set transfer rate
 
-ldi temp, (1<<RXEN0) | (1<<TXEN0)
-sts UCSR0B, temp			;enable UART flag for receiving
+ldi temp, (1<<RXEN1) | (1<<TXEN1) | (1<<RXCIE1) | (1<<UDRIE1)
+sts UCSR1B, temp			;enable UART flag for receiving
 							;and transmitting
 
 sei
-clr led_output
+clr ledState
 
 ;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 ; main_loop
@@ -110,7 +107,7 @@ led_output:
 ;       UART 0. Loads the received data into ledState
 ;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<	
 data_received_interrupt:
-	lds ledState, UDR0		;load received data to ledState
+	lds ledState, UDR1		;load received data to ledState
     ldi dataReceived, TRUE
 
     reti
@@ -125,17 +122,8 @@ buffer_empty_interrupt:
     cpi dataReceived, FALSE
     breq buffer_empty_end
 
-	sts UDR0, ledState	;send data
+	sts UDR1, ledState	;send data
+	ldi dataReceived, FALSE
         
     buffer_empty_end:
         reti
-
-;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-; data_transmitted_interrupt
-;       Triggered when data has finished transmitting. 
-;       Sets dataReceived to false
-;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<	
-data_transmitted_interrupt:
-    ldi dataReceived, FALSE
-
-    reti

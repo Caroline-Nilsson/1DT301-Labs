@@ -27,7 +27,7 @@
 ;
 ;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-.inc "m2560def.inc"
+.include "m2560def.inc"
 
 .def temp = r16
 .def ledState = r17
@@ -35,7 +35,11 @@
 
 .equ TRANSFER_RATE = 12 	;1MHz, 4800 bps
 
+.org 0
+rjmp reset
 
+.org 0x72
+reset:
 ;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 ;Initialize Stack Pointer
 ;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -54,31 +58,47 @@ out DDRB, temp
 ; Initialize Serial Communication
 ;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 ldi temp, TRANSFER_RATE
-sts UBRR0L, temp			;set transfer rate
+sts UBRR1L, temp			;set transfer rate
 
 ;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 ; Enable recieve data and transfer data
 ;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-ldi temp, (1<<RXEN0) | (1<<TXEN0)
-sts UCSR0B, temp			;enable UART flag for receiving
+ldi temp, (1<<TXEN1) | (1<<RXEN1) 
+sts UCSR1B, temp			;enable UART flag for receiving
 							;and transmitting
 
+clr ledState
+rcall led_output
 ;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 ; Check for received data
 ;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 main_loop:
-	sbis USCR0A, RXC0		;if RXC flag is clear
+	lds temp, UCSR1A
+	sbrs temp, RXC1			;if RXC flag is clear
 		rjmp main_loop		;then jump to start
 		
-	lds ledState, UDR0		;load received data to ledState
+	lds ledState, UDR1		;load received data to ledState
 	
 	rcall led_output
 	
+;	ldi  r31, 6
+;    ldi  r30, 19
+;    ldi  r29, 174
+;L1: dec  r29
+;    brne L1
+;    dec  r30
+;    brne L1
+;    dec  r31
+;    brne L1
+;    rjmp PC+1
+
+
 	echo:	
-		sbis USCR0A, UDRE0	;if transferbuffer !set
+		lds temp, UCSR1A
+		sbrs temp, UDRE1	;if transferbuffer !set
 			rjmp echo		;then jump to echo
 		
-		sts UDR0, ledState	;send data
+		sts UDR1, ledState	;send data
 		
 	rjmp main_loop
 

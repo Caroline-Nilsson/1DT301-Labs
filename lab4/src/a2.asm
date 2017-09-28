@@ -26,7 +26,7 @@
 ;                       
 ;
 ;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-.inc "m2560def.inc"
+.include "m2560def.inc"
 
 .def temp = r16
 .def ledState = r17     ; Value to be written to LEDs
@@ -41,7 +41,7 @@
 .equ LED_OFF = 0x00
 .equ LED_ON = 0x01
 .equ DUTY_CYCLE_MIN = 0
-.equ DUTY_CYCLE_MAX = 19
+.equ DUTY_CYCLE_MAX = 20
 
 .cseg
 
@@ -82,10 +82,6 @@ out SPH, temp
 ldi temp, 0x01
 out DDRB, temp
 
-; PortC = input
-clr temp
-out DDRC, temp
-
 ;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 ; Initialize timer
 ;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -95,11 +91,11 @@ out TCCR0B, temp
 
 ; Enable interrupt on timer overflow
 ldi temp, (1<<TOIE0)
-out TIMSK0, temp
+sts TIMSK0, temp
 
 ; Set default value for timer
 ldi temp, INIT_TIMER_VALUE	
-out TNCT0, temp
+out TCNT0, temp
 
 ;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 ; Initialize switch interrupts
@@ -110,10 +106,11 @@ out EIMSK, temp
 
 ; Trigger interrupts on falling edge (switch released)
 ldi temp, (3 << ISC00) | (3 << ISC10)
-out EICRA, temp
+sts EICRA, temp
 
 sei
 clr ledState
+ldi dutyCycle, 9
 
 ;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 ; main_loop
@@ -156,9 +153,15 @@ timer_interrupt:
 	
 	; Reset starting value for timer
 	ldi temp, INIT_TIMER_VALUE	
-	out TNCT0, temp
-	
-	cpi counter, dutyCycle      ; if counter < dutyCycle
+	out TCNT0, temp
+
+	cpi counter, DUTY_CYCLE_MAX
+	brlo compare_duty_cycle
+
+	ldi counter, DUTY_CYCLE_MIN
+
+	compare_duty_cycle:
+	cp counter, dutyCycle      ; if counter < dutyCycle
 	brlo set_led_on             ;     then turn LED on
    	rjmp set_led_off            ; else turn LED off
 	
@@ -181,14 +184,29 @@ timer_interrupt:
 ;       duty cycle if it's not already at DUTY_CYCLE_MAX
 ;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 sw0_interrupt:
-    ; Delay switch
+    lds temp, PORTD
+	
+	sw0_loop:
+    ldi  r31, 130
+    ldi  r30, 222
+L1: dec  r30
+    brne L1
+    dec  r31
+    brne L1
+    nop
 
-    cpi dutyCycle, DUTY_CYCLE_MAX ; If dutyCycle == 19
+	lds r29, PORTD
+	cp temp, r29
+	brne sw0_loop
+
+    cpi dutyCycle, DUTY_CYCLE_MAX ; If dutyCycle == 20
     breq sw0_int_end              ;     then skip to end
 
     inc dutyCycle                 ; else increment dutyCycle
 
     sw0_int_end:
+		ldi temp, 0x00
+		sts EIFR, temp
         reti
 
 ;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -197,7 +215,20 @@ sw0_interrupt:
 ;       duty cycle if it's not already at DUTY_CYCLE_MIN
 ;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 sw1_interrupt:
-    ; Delay switch
+	lds temp, PORTD
+	
+	sw1_loop:
+    ldi  r31, 130
+    ldi  r30, 222
+L2: dec  r30
+    brne L2
+    dec  r31
+    brne L2
+    nop
+
+	lds r29, PORTD
+	cp temp, r29
+	brne sw1_loop
 
     cpi dutyCycle, DUTY_CYCLE_MIN ; If dutyCycle == 0
     breq sw0_int_end              ;     then skip to end
@@ -205,4 +236,6 @@ sw1_interrupt:
     dec dutyCycle                 ; else decrement dutyCycle
 
     sw1_int_end:
-        reti
+		ldi temp, 0x00
+		sts EIFR, temp
+	    reti

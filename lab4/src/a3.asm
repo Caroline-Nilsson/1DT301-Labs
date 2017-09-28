@@ -27,7 +27,7 @@
 ;
 ;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-.inc "m2560def.inc"
+.include "m2560def.inc"
 
 .def temp = r16
 .def ledState = r17
@@ -54,23 +54,28 @@ out DDRB, temp
 ; Initialize Serial Communication
 ;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 ldi temp, TRANSFER_RATE
-sts UBRR0L, temp			;set transfer rate
+sts UBRR1L, temp			;set transfer rate
 
 ;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 ; Enable recieve data
 ;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-ldi temp, (1<<RXEN0)
-sts UCSR0B, temp			;enable UART flag for receiving
+ldi temp, (1<<RXEN1)
+sts UCSR1B, temp			;enable UART flag for receiving
+
+clr ledState
+rcall led_output
 
 ;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 ; Check for received data
 ;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 main_loop:
-	sbis USCR0A, RXC0		;if RXC flag is clear
+	lds temp, UCSR1A
+	sbrs temp, RXC1		    ;if RXC flag is clear
 		rjmp main_loop		;then jump to start
 		
-	lds ledState, UDR0		;load received data to ledState
-	
+	lds ledState, UDR1		;load received data to ledState
+
+	flush_finished:
 	rcall led_output
 	rjmp main_loop
 

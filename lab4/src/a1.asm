@@ -26,7 +26,7 @@
 ;
 ;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-.inc "m2560def.inc"
+.include "m2560def.inc"
 
 .def temp = r16
 .def ledState = r17
@@ -63,11 +63,11 @@ out TCCR0B, temp
 
 ;enable overflow flag
 ldi temp, (1<<TOIE0)
-out TIMSK0, temp
+sts TIMSK0, temp
 
 ;set default value for timer
 ldi temp, INIT_TIMER_VALUE	
-out TNCT0, temp
+out TCNT0, temp
 
 sei
 clr ledState
@@ -83,7 +83,7 @@ interrupt:
 	
 	;set start value for timer
 	ldi temp, INIT_TIMER_VALUE	
-	out TNCT0, temp
+	out TCNT0, temp
 	
 	inc counter
 	
