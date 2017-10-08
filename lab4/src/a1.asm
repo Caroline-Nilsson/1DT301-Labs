@@ -1,27 +1,29 @@
 ;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 ;   1DT301, Computer Technology I
-;   Date: YYYY-MM-DD
+;   Date: 2017-10-08
 ;   Author:
 ;                       Caroline Nilsson            (cn222nd)
 ;                       Daniel Alm Grundström       (dg222dw)
 ;
-;   Lab number:         
-;   Title:              
+;   Lab number:         4
+;   Title:              Timers & USART
 ;
 ;   Hardware:           STK600, CPU ATmega2560
 ;
-;   Function:           
+;   Function:           Toggles LED0 on/off every 0.5 seconds using timers and
+;						overflow interrupts.
 ;
-;   Input ports:        
+;   Input ports:        N/A
 ;
-;   Output ports:       
+;   Output ports:       PORTB, PINB0
 ;
-;   Subroutines:        
+;   Subroutines:        N/A
 ;   Included files:     m2560def.inc
 ;
-;   Other information:  
+;   Other information:  N/A
 ;
-;   Changes in program: 
+;   Changes in program: 2017-10-08
+;						Adds file header with program description.
 ;                       
 ;
 ;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -33,7 +35,8 @@
 .def counter = r18
 
 .equ COMPARISON = 2
-.equ INIT_TIMER_VALUE = 6
+.equ PRESCALE = 0x05			; = 1024, for 1MHz -> 1 count/ms
+.equ INIT_TIMER_VALUE = 5		; counter overflow every 250 ms = 1/4 sec 
 
 .cseg
 
@@ -46,6 +49,7 @@ rjmp reset
 rjmp interrupt
 
 .org 0x72
+
 reset:
 ;Initialize Stack Pointer
 ldi temp, LOW(RAMEND)
@@ -57,8 +61,8 @@ out SPH, temp
 ldi temp, 0x01
 out DDRB, temp
 
-;set prescale to 1024
-ldi temp, 0x05
+;set prescale
+ldi temp, PRESCALE
 out TCCR0B, temp
 
 ;enable overflow flag
@@ -72,16 +76,23 @@ out TCNT0, temp
 sei
 clr ledState
 
+;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+; Repeatedly outputs ledState while waiting for interrupt
+;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 main_loop:
 	out PORTB, ledState
 	rjmp main_loop
-	
+
+;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+; Timer0 overflow interrupt, triggered every 250 ms. Toggles led
+; every 2 times the interrupt is triggered.
+;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 interrupt:
-	;save Status Register in Stack
-	in temp, sreg
+	;save Status Register on stack 
+	in temp, SREG
 	push temp
 	
-	;set start value for timer
+	;set start value for timer so next interrupt occurs after 250 ms
 	ldi temp, INIT_TIMER_VALUE	
 	out TCNT0, temp
 	
@@ -93,11 +104,12 @@ interrupt:
 	
 	rjmp end
 	
+	; Toggle LED0
 	change_led_state:
 		com ledState
 		clr counter
 		
 	end:
 		pop temp
-		out sreg, temp
+		out SREG, temp
 		reti
