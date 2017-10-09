@@ -1,30 +1,37 @@
 ;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 ;   1DT301, Computer Technology I
-;   Date: YYYY-MM-DD
+;   Date: 2017-10-09
 ;   Author:
 ;                       Caroline Nilsson            (cn222nd)
 ;                       Daniel Alm Grundström       (dg222dw)
 ;
-;   Lab number:         
-;   Title:              
+;   Lab number:         4
+;   Title:              Timer and USART
 ;
 ;   Hardware:           STK600, CPU ATmega2560
 ;
-;   Function:           
+;   Function:           Builds on assignment 1 to implement a Pulse Width 
+;                       Modulator (PWM) which allows the duty cycle of the 
+;                       wave to be changed by pressing SW0 or SW1.
 ;
-;   Input ports:        
+;                       The duty cycle starts at 50% (On: 0.5 sec, Off: 0.5 sec)
+;                       and can be increased in steps of 5% by pressing SW0 and
+;                       decreased in steps of 5% by pressing SW1.    
 ;
-;   Output ports:       
+;   Input ports:        PORTC, PINC0 & PINC1
 ;
-;   Subroutines:        
+;   Output ports:       PORTB, PINB0
+;
+;   Subroutines:        led_out - outputs complement of ledState to PORT B
 ;   Included files:     m2560def.inc
 ;
-;   Other information:  
+;   Other information:  N/A
 ;
-;   Changes in program: 2017-09-26
-;                       Implements flowchart design.
+;   Changes in program: 2017-10-09
+;                       Adds file header with program description.
 ;                       
-;
+;                       2017-09-26
+;                       Implements flowchart design.
 ;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 .include "m2560def.inc"
 
@@ -43,29 +50,26 @@
 .equ DUTY_CYCLE_MIN = 0
 .equ DUTY_CYCLE_MAX = 20
 
-.cseg
+.CSEG
 
 ; Initialize starting point for program
-.org 0
+.ORG 0
 rjmp reset
 
 ; Initialize timer overflow interrupt vector
-.org OVF0ADDR
+.ORG OVF0ADDR
 rjmp timer_interrupt
 
 ; Initialize SW0 interrupt vector
-.org INT0ADDR
+.ORG INT0ADDR
 rjmp sw0_interrupt
 
 ; Initialize SW1 interrupt vector
-.org INT1ADDR
+.ORG INT1ADDR
 rjmp sw1_interrupt
 
-.org 0x72
+.ORG 0x72
 
-;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-; reset - called on program start and on reset interrupts
-;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 reset:
 ;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 ;Initialize Stack Pointer

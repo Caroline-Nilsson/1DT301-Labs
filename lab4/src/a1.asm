@@ -6,12 +6,13 @@
 ;                       Daniel Alm Grundström       (dg222dw)
 ;
 ;   Lab number:         4
-;   Title:              Timers & USART
+;   Title:              Timer and USART
 ;
 ;   Hardware:           STK600, CPU ATmega2560
 ;
-;   Function:           Toggles LED0 on/off every 0.5 seconds using timers and
-;						overflow interrupts.
+;   Function:           Generates a square wave with a frequency of 1 Hz and a
+;						duty cycle of 50%, which turns LED0 on/off every 1/2 
+;						second.  
 ;
 ;   Input ports:        N/A
 ;
@@ -22,10 +23,14 @@
 ;
 ;   Other information:  N/A
 ;
-;   Changes in program: 2017-10-08
+;   Changes in program: 2017-10-09
+;						Update some comments to make them clearer.
+;						
+;						2017-10-08
 ;						Adds file header with program description.
 ;                       
-;
+;						2017-09-25
+;						Implements flowchart design.
 ;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 .include "m2560def.inc"
@@ -35,32 +40,38 @@
 .def counter = r18
 
 .equ COMPARISON = 2
-.equ PRESCALE = 0x05			; = 1024, for 1MHz -> 1 count/ms
-.equ INIT_TIMER_VALUE = 5		; counter overflow every 250 ms = 1/4 sec 
+.equ PRESCALE = 0x05				; = 1024, for 1MHz -> 1 count/ms
+.equ INIT_TIMER_VALUE = 6			; counter overflow every 250 ms = 1/4 sec 
 
-.cseg
+.CSEG
 
-;Initialize starting point for program
-.org 0
+.ORG 0
 rjmp reset
 
 ;Initialize timer overflow interrupt vector
-.org ovf0addr
+.ORG ovf0addr
 rjmp interrupt
 
-.org 0x72
+.ORG 0x72
 
 reset:
-;Initialize Stack Pointer
+;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+; Initialize stack pointer
+;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 ldi temp, LOW(RAMEND)
 out SPL, temp
 ldi temp, HIGH(RAMEND)
 out SPH, temp
 
-;PortB, Pin0 = output
+;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+; Initialize PORT B as output 
+;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 ldi temp, 0x01
 out DDRB, temp
 
+;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+; Initialize Timer
+;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 ;set prescale
 ldi temp, PRESCALE
 out TCCR0B, temp
@@ -98,16 +109,14 @@ interrupt:
 	
 	inc counter
 	
-	;if counter = 2, branch to change_led_state
-	cpi counter, COMPARISON
-	breq change_led_state
+	cpi counter, COMPARISON 		; if counter = 2 (1/2 seconds has passed)
+	breq change_led_state			;    then branch to change_led_state
 	
 	rjmp end
 	
-	; Toggle LED0
 	change_led_state:
-		com ledState
-		clr counter
+		com ledState 				; toggle LED0
+		clr counter					; reset counter to 0
 		
 	end:
 		pop temp
