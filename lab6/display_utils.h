@@ -40,6 +40,7 @@ void init_serial_comm(uint8_t ucsr1b_flags);
 Frame create_frame(FrameType type);
 void send_frame(const Frame *frame);
 void uart_transmit(unsigned char data);
+unsigned char uart_receive();
 void clear_array(char arr[], uint8_t length);
 uint8_t calculate_checksum(const Frame *frame);
 void set_checksum(Frame *frame, uint8_t checksum);

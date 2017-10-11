@@ -19,6 +19,7 @@ int main() {
     
     send_frame(&info_frame);
     send_frame(&image_frame);
+
 #ifndef DEBUG
     // Wait indefinitely (Unsure if neccesary)
     for (;;) {

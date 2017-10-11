@@ -101,7 +101,7 @@ void send_frame(const Frame *frame) {
 }
 
 /*
- * Sends a byte of data through the serial port.
+ * Sends a byte of data through the serial port (UART).
  */
 void uart_transmit(unsigned char data) {
 #ifndef DEBUG
@@ -114,6 +114,18 @@ void uart_transmit(unsigned char data) {
 #endif
 
     debug_print("transmitting: \t %d \t %02X \t '%c'\n", (int)data, data, data);
+}
+
+/*
+ * Reads a byte from the serial port (UART).
+ */
+unsigned char uart_receive() {
+    // Wait until data received flag set
+    while (UCSR1A & (1 << RXC1) == 0) {
+        ;
+    }
+
+    return UDR1;
 }
 
 /*
@@ -133,7 +145,7 @@ void clear_array(char arr[], uint8_t length) {
  */
 uint8_t calculate_checksum(const Frame *frame) {
     uint8_t sum = frame->start + (uint8_t)frame->address;
-
+    
     for (int8_t i = 0; i < INFO_FRAME_COMMAND_LEN; i++) {
         sum = sum + (uint8_t)frame->command[i];
     }
