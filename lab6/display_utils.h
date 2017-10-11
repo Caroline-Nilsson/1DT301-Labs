@@ -36,7 +36,7 @@ struct Frame {
 typedef struct Frame Frame;
 
 // Function prototypes
-void init_serial_comm(uint8_t uscrb_flags);
+void init_serial_comm(uint8_t ucsr1b_flags);
 Frame create_frame(FrameType type);
 void send_frame(const Frame *frame);
 void uart_transmit(unsigned char data);

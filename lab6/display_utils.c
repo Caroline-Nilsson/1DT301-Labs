@@ -15,10 +15,10 @@
  * Sets the USART transfer rate and enables specified usart control register
  * flags.
  */
-void init_serial_comm(uint8_t uscrb_flags) {
+void init_serial_comm(uint8_t ucsr1b_flags) {
 #ifndef DEBUG
     UBRR1L = TRANSFER_RATE;
-    USCR1B = uscrb_flags;
+    UCSR1B = ucsr1b_flags;
 #endif
 }
 
@@ -106,11 +106,11 @@ void send_frame(const Frame *frame) {
 void uart_transmit(unsigned char data) {
 #ifndef DEBUG
     // Wait until transmit buffer is clear
-    while (! (USCRA & (1 << UDRE))) {
+    while (! (UCSR1A & (1 << UDRE1))) {
         ;
     }
 
-    UDR = data; // transmit data
+    UDR1 = data; // transmit data
 #endif
 
     debug_print("transmitting: \t %d \t %02X \t '%c'\n", (int)data, data, data);
