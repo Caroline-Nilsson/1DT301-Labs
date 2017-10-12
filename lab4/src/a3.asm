@@ -1,27 +1,32 @@
 ;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 ;   1DT301, Computer Technology I
-;   Date: YYYY-MM-DD
+;   Date: 2017-10-12
 ;   Author:
 ;                       Caroline Nilsson            (cn222nd)
 ;                       Daniel Alm Grundström       (dg222dw)
 ;
-;   Lab number:         
-;   Title:              
+;   Lab number:         4
+;   Title:              Timer and USART
 ;
 ;   Hardware:           STK600, CPU ATmega2560
 ;
-;   Function:           
+;   Function:           Program that polls the serial port for input characters
+;						and outputs them in ASCII binary to PORTB.
 ;
-;   Input ports:        
+;   Input ports:        RS232
 ;
-;   Output ports:       
+;   Output ports:       PORTB
 ;
-;   Subroutines:        
+;   Subroutines:        led_output - outputs complement of register ledState
+;									 to PORTB 
 ;   Included files:     m2560def.inc
 ;
-;   Other information:  
+;   Other information:  Putty is used to enter characters on the computer.
 ;
-;   Changes in program: 2017-09-27
+;   Changes in program: 2017-10-12
+;						Adds comment header.
+;
+;						2017-09-27
 ;                       Implements flowchart design.
 ;                       
 ;
