@@ -32,8 +32,7 @@ reset:
     ser temp
     out LCD_DATA_DIR, temp
 
-    clr temp
-    out SWITCH_DATA_DIR, temp 
+	out DDRB, temp
 
     ; Initialize display
     rcall init_display
@@ -148,6 +147,7 @@ data_received_interrupt:
     rcall clear_display
 
     lds data, UDR1
+	out PORTB, data
     rcall write_char
 
     reti

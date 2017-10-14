@@ -14,7 +14,7 @@
 .equ PRESCALE = 0x05                    ; = 1024 = increment once per ms (1MHz)
 .equ INIT_TIMER_VALUE = 6
 .equ FIVE_SECONDS = 20
-.equ NEW_LINE_CMD = 0b0000_0010
+.equ NEW_LINE_CMD = 0b1010_0000
 
 .cseg
 .org 0x00
@@ -39,9 +39,6 @@ reset:
     ; set LCD output port
     ser temp
     out LCD_DATA_DIR, temp
-
-    clr temp
-    out SWITCH_DATA_DIR, temp 
 
     ; Initialize display
     rcall init_display
@@ -167,7 +164,6 @@ switch_output:
     ret
 
 data_received_interrupt:
-    rcall clear_display
 
     lds data, UDR1
     rcall write_char
