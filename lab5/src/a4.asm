@@ -3,6 +3,7 @@
 .def data = r17
 .def RS = r18
 .def counter = r19
+.def cspaceCounter = r20
 
 .equ BITMODE4 = 0b0000_0010
 .equ CLEAR = 0b0000_0001
@@ -14,7 +15,9 @@
 .equ PRESCALE = 0x05                    ; = 1024 = increment once per ms (1MHz)
 .equ INIT_TIMER_VALUE = 6
 .equ FIVE_SECONDS = 20
-.equ NEW_LINE_CMD = 0b0000_0010
+.equ SPACE_CMD = 0b0010_0000
+.equ ENTRY_MODE_MOVE = 0b0000_0101
+.equ ENTRY_MODE_DEFAULT = 0b0000_0100
 
 .cseg
 .org 0x00
@@ -39,9 +42,6 @@ reset:
     ; set LCD output port
     ser temp
     out LCD_DATA_DIR, temp
-
-    clr temp
-    out SWITCH_DATA_DIR, temp 
 
     ; Initialize display
     rcall init_display
@@ -167,7 +167,6 @@ switch_output:
     ret
 
 data_received_interrupt:
-    rcall clear_display
 
     lds data, UDR1
     rcall write_char
@@ -184,8 +183,21 @@ timer_interrupt:
     cpi counter, FIVE_SECONDS
     brlo timer_end
 
-    ldi data, NEW_LINE_CMD
+    ldi spaceCounter, 0
+	ldi data, ENTRY_MODE_MOVE
     rcall write_cmd
+	
+move_row:
+	ldi data, SPACE_CMD
+	rcall write_char
+	inc spaceCounter
+	
+	cpi spaceCounter, 20
+	brlo move_row
+	
+	ldi data, ENTRY_MODE_DEFAULT
+	rcall write_cmd
+	
     clr counter
 
 timer_end:

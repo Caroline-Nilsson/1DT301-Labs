@@ -4,6 +4,7 @@
 .def RS = r18
 .def value = r19
 .def tensNumber = r20
+.def tempValue = r21
 
 .equ BITMODE4 = 0b0000_0010
 .equ CLEAR = 0b0000_0001
@@ -161,7 +162,11 @@ switch_output:
     ret
 
 switch0_interrupt:
-    lds temp, PORTD
+	in temp, SREG
+	push temp
+
+    mov tempValue, value
+	lds temp, PORTD
     
 sw0_loop:
     ldi  r31, 130
@@ -179,22 +184,25 @@ L1: dec  r30
     ldi tensNumber, 0
 
 subtract_loop:
-    cpi value, 10
+    cpi tempValue, 10
     brge subtract
 
-    rcall clear_display
+	rcall clear_display
 
     mov data, tensNumber
-    or data, PREFIX
+    ori data, PREFIX
+    rcall write_char
+	rcall long_wait
+
+    mov data, tempValue
+    ori data, PREFIX
     rcall write_char
 
-    mov data, value
-    or data, PREFIX
-    rcall write_char
-
+	pop temp
+	out SREG, temp
     reti
 
 subtract:
-    subi value, 10
+    subi tempValue, 10
     inc tensNumber
     rjmp subtract_loop
