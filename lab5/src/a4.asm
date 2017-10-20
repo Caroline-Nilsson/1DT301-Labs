@@ -3,7 +3,8 @@
 .def data = r17
 .def RS = r18
 .def counter = r19
-.def cspaceCounter = r20
+.def addrCounter = r20
+.def addrCounterStore = r21
 
 .equ BITMODE4 = 0b0000_0010
 .equ CLEAR = 0b0000_0001
@@ -13,21 +14,12 @@
 .equ LCD_DATA_DIR = DDRE                ; Data dir. of port LCD is connected to
 .equ TRANSFER_RATE = 12                 ; = 4800 bps (1MHz) 
 .equ PRESCALE = 0x05                    ; = 1024 = increment once per ms (1MHz)
-.equ INIT_TIMER_VALUE = 6
-.equ FIVE_SECONDS = 20
-.equ SPACE_CMD = 0b0010_0000
-.equ ENTRY_MODE_MOVE = 0b0000_0101
-.equ ENTRY_MODE_DEFAULT = 0b0000_0100
+.equ NEW_LINE = 0b0010_0011
+.equ RAM_ADDR = 0x0200
 
 .cseg
 .org 0x00
     jmp reset
-
-.org URXC1addr
-    jmp data_received_interrupt
-
-.org ovf0addr
-    jmp timer_interrupt
 
 .org 0x72
 
@@ -52,28 +44,28 @@ reset:
     ldi temp, TRANSFER_RATE
     sts UBRR1L, temp                    ;set transfer rate
 
-    ldi temp, (1<<RXEN1) | (1<<RXCIE1)
+    ldi temp, (1<<RXEN1)
     sts UCSR1B, temp                    ;enable UART flag for receiving
-
-    ;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    ; Initialize Timer
-    ;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    ;set prescale to 1024
-    ldi temp, 0x05
-    out TCCR0B, temp
-
-    ;enable overflow flag
-    ldi temp, (1<<TOIE0)
-    sts TIMSK0, temp
-
-    ;set default value for timer
-    ldi temp, INIT_TIMER_VALUE  
-    out TCNT0, temp
     
     sei
     
+	clr addrCounter
+	clr counter
+	ldi XH, HIGH(RAM_ADDR)
+	ldi XL, LOW(RAM_ADDR)
+
+    rcall read_lines
+
+	ldi XH, HIGH(RAM_ADDR)
+	ldi XL, LOW(RAM_ADDR)
+
 main_loop:
-    nop
+	mov addrCounterStore, addrCounter
+	rcall write_c
+	mov addrCounter, addrCounterStore
+	rcall delay_5sec
+	rcall write_new_lines
+	
     rjmp main_loop
 
 ; Display subroutines
@@ -166,40 +158,80 @@ switch_output:
     pop temp
     ret
 
-data_received_interrupt:
+read_lines:
+	lds temp, UCSR1A
+	sbrs temp, RXC1			;if RXC flag is clear
+		rjmp read_lines		;then jump to start
+		
+	lds data, UDR1			;load received data to ledState
 
-    lds data, UDR1
-    rcall write_char
+	cpi data, NEW_LINE
+	brne store_char
 
-    reti
+	inc counter
 
-timer_interrupt:
-    push temp
-    ldi temp, INIT_TIMER_VALUE
-    out TCNT0, temp
+	cpi counter, 4
+	brge read_lines_end
 
-    inc counter
+store_char:
+	inc addrCounter
+	st X+, data
 
-    cpi counter, FIVE_SECONDS
-    brlo timer_end
+	rjmp read_lines
 
-    ldi spaceCounter, 0
-	ldi data, ENTRY_MODE_MOVE
-    rcall write_cmd
-	
-move_row:
-	ldi data, SPACE_CMD
+read_lines_end:
+    ret
+
+write_c:
+	cpi addrCounter, 0
+	breq write_lines_end
+
+	ld data, X+
+	cpi data, NEW_LINE
+	breq write_lines_end
 	rcall write_char
-	inc spaceCounter
-	
-	cpi spaceCounter, 20
-	brlo move_row
-	
-	ldi data, ENTRY_MODE_DEFAULT
-	rcall write_cmd
-	
-    clr counter
 
-timer_end:
-    pop temp
-    reti
+	rjmp write_c
+
+write_lines_end:	
+	ret
+
+write_new_lines:
+	rcall clear_display
+	ldi counter, 40
+
+write_new_line:
+	ldi data, 0b0010_0000
+	rcall write_char
+	
+	dec counter
+	cpi counter, 1
+	brge write_new_line
+
+	rcall write_c
+
+	ldi data, 0b0000_0010
+	rcall write_cmd
+
+	ret
+
+delay_5sec:
+	push r18
+	push r19
+	push r20
+
+    ldi  r18, 26
+    ldi  r19, 94
+    ldi  r20, 111
+L1: dec  r20
+    brne L1
+    dec  r19
+    brne L1
+    dec  r18
+    brne L1
+    nop
+
+	pop r20
+	pop r19
+	pop r18
+	ret
