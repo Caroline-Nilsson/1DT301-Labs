@@ -3,8 +3,6 @@
 .def data = r17
 .def RS = r18
 .def counter = r19
-.def addrCounter = r20
-.def addrCounterStore = r21
 
 .equ BITMODE4 = 0b0000_0010
 .equ CLEAR = 0b0000_0001
@@ -49,22 +47,30 @@ reset:
     
     sei
     
-	clr addrCounter
 	clr counter
 	ldi XH, HIGH(RAM_ADDR)
 	ldi XL, LOW(RAM_ADDR)
 
     rcall read_lines
 
+main_loop:
+	
 	ldi XH, HIGH(RAM_ADDR)
 	ldi XL, LOW(RAM_ADDR)
-
-main_loop:
-	mov addrCounterStore, addrCounter
-	rcall write_c
-	mov addrCounter, addrCounterStore
+	
+	ldi YH, HIGH(RAM_ADDR)
+	ldi YL, LOW(RAM_ADDR)
+	
+	clr counter
+four_row_loop:
+	inc counter
+	
+	rcall write_main
 	rcall delay_5sec
 	rcall write_new_lines
+	
+	cpi counter, 4
+	brlo four_row_loop
 	
     rjmp main_loop
 
@@ -174,29 +180,32 @@ read_lines:
 	brge read_lines_end
 
 store_char:
-	inc addrCounter
 	st X+, data
 
 	rjmp read_lines
 
 read_lines_end:
+	ldi data, NEW_LINE
+	st X+, data
     ret
 
-write_c:
-	cpi addrCounter, 0
-	breq write_lines_end
-
+	
+write_main:
+	
 	ld data, X+
+	
 	cpi data, NEW_LINE
 	breq write_lines_end
+	
 	rcall write_char
 
-	rjmp write_c
+	rjmp write_main
 
 write_lines_end:	
 	ret
 
 write_new_lines:
+	push counter
 	rcall clear_display
 	ldi counter, 40
 
@@ -208,11 +217,25 @@ write_new_line:
 	cpi counter, 1
 	brge write_new_line
 
-	rcall write_c
+	rcall write_second_line
 
 	ldi data, 0b0000_0010
 	rcall write_cmd
 
+	pop counter
+	ret
+
+write_second_line:
+	ld data, Y+
+	
+	cpi data, NEW_LINE
+	breq write_second_line_end
+	
+	rcall write_char
+
+	rjmp write_second_line
+
+write_second_line_end:	
 	ret
 
 delay_5sec:
