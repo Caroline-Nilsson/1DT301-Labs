@@ -3,6 +3,10 @@
 
 #include <avr/io.h>
 
+#define FOSC 1000000UL // Clock Speed
+#define BAUD 4800
+#define (BAUD_PRESCALE FOSC/16/BAUD-1)
+
 #include "display_utils.h"
 
 /*
@@ -10,8 +14,11 @@
  * flags.
  */
 void init_serial_comm(uint8_t ucsr1b_flags) {
-    UBRR1L = TRANSFER_RATE;
+    UBRR1H = (unsigned char)(BAUD_PRESCALE >> 8);
+    UBRR1L = (unsigned char)BAUD_PRESCALE;
     UCSR1B = ucsr1b_flags;
+    UCSR1C = (3 << UCSZ10); // asynchronous mode, 8-bit data length,
+                            // no parity bit, 1 stop bit 
 }
 
 /*
