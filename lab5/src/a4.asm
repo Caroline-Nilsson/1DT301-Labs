@@ -198,7 +198,7 @@ write_main:
 	breq write_lines_end
 	
 	rcall write_char
-
+	rcall long_wait
 	rjmp write_main
 
 write_lines_end:	
@@ -212,6 +212,7 @@ write_new_lines:
 write_new_line:
 	ldi data, 0b0010_0000
 	rcall write_char
+	rcall short_wait
 	
 	dec counter
 	cpi counter, 1
@@ -221,6 +222,7 @@ write_new_line:
 
 	ldi data, 0b0000_0010
 	rcall write_cmd
+	rcall long_wait
 
 	pop counter
 	ret
@@ -232,6 +234,7 @@ write_second_line:
 	breq write_second_line_end
 	
 	rcall write_char
+	rcall long_wait
 
 	rjmp write_second_line
 
