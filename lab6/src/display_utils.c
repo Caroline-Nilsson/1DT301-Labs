@@ -4,8 +4,8 @@
 #include <avr/io.h>
 
 #define FOSC 1000000UL // Clock Speed
-#define BAUD 4800
-#define (BAUD_PRESCALE FOSC/16/BAUD-1)
+#define BAUD 2400
+#define BAUD_PRESCALE (FOSC/16/BAUD-1)
 
 #include "display_utils.h"
 
