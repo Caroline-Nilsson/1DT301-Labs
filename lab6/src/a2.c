@@ -4,25 +4,33 @@
 
 #include "display_utils.h"
 
+#define LINE_1 "Rad 1"
+#define LINE_2 "Rad 2"
+#define LINE_3 "Rad 3"
+
 int main() {
-    init_serial_comm(1 << TXEN1);
+	init_serial_comm(1 << TXEN1);
 
-    Frame info_frame = create_frame(Information);
-    strncpy(info_frame.line_1, "Hej", 3);
-    strncpy(info_frame.line_2, "pa", 2);
-    strncpy(info_frame.line_3, "dej", 3);
-    set_checksum(&info_frame, calculate_checksum(&info_frame));
+	Frame first_lines = create_frame(Information);
+	Frame last_line = create_frame(Information);
+	first_lines.address = 'A';
+	last_line.address = 'B';
 
-    Frame image_frame = create_frame(Image);
-    set_checksum(&image_frame, calculate_checksum(&image_frame));
+	strncpy(first_lines.line_1, LINE_1, strlen(LINE_1));
+	strncpy(first_lines.line_2, LINE_2, strlen(LINE_2));
+	set_checksum(&first_lines, calculate_checksum(&first_lines, 1));
 
-    send_frame(&info_frame);
-    send_frame(&image_frame);
+	Frame image_frame = create_frame(Image);
+	set_checksum(&image_frame, calculate_checksum(&image_frame, 1));
 
-    // Wait indefinitely (Unsure if neccesary)
-    for (;;) {
-        ;
-    }
+	send_frame(&first_lines, 1);
+	send_frame(&image_frame, 1);
 
-    return 0;
+	strncpy(last_line.line_1, LINE_3, strlen(LINE_3));
+	set_checksum(&last_line, calculate_checksum(&last_line, 3));
+
+	send_frame(&last_line, 3);
+	send_frame(&image_frame, 3);
+
+	return 0;
 }

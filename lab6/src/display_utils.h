@@ -28,7 +28,6 @@ struct Frame {
     char command[INFO_FRAME_COMMAND_LEN];
     char line_1[INFO_FRAME_LINE_LEN];
     char line_2[INFO_FRAME_LINE_LEN];
-    char line_3[INFO_FRAME_LINE_LEN];
     char checksum[FRAME_CHECKSUM_LEN];
     uint8_t end;
 };
@@ -38,11 +37,11 @@ typedef struct Frame Frame;
 // Function prototypes
 void init_serial_comm(uint8_t ucsr1b_flags);
 Frame create_frame(FrameType type);
-void send_frame(const Frame *frame);
+void send_frame(const Frame *frame, int line);
 void uart_transmit(unsigned char data);
 unsigned char uart_receive();
-void clear_array(char arr[], uint8_t length);
-uint8_t calculate_checksum(const Frame *frame);
+void clear_array(char arr[], uint8_t length, unsigned char c);
+uint8_t calculate_checksum(const Frame *frame, int line);
 void set_checksum(Frame *frame, uint8_t checksum);
 
 #endif /* DISPLAY_UTILS_H */

@@ -27,15 +27,13 @@ void init_serial_comm(uint8_t ucsr1b_flags) {
  */
 Frame create_frame(FrameType type) {
     Frame frame;
-    clear_array(frame.line_1, INFO_FRAME_LINE_LEN);
-    clear_array(frame.line_2, INFO_FRAME_LINE_LEN);
-    clear_array(frame.line_3, INFO_FRAME_LINE_LEN);
-    clear_array(frame.command, INFO_FRAME_COMMAND_LEN);
+    clear_array(frame.line_1, INFO_FRAME_LINE_LEN, ' ');
+    clear_array(frame.line_2, INFO_FRAME_LINE_LEN, ' ');
+    clear_array(frame.command, INFO_FRAME_COMMAND_LEN, 0);
     
     frame.type = type;
     frame.start = 0x0D;
     frame.end = 0x0A;
-    frame.address = 'Z';
 
     if (type == Information) {
         strncpy(frame.command, "O0001",
@@ -43,6 +41,7 @@ Frame create_frame(FrameType type) {
     } else if (type == Image) {
         strncpy(frame.command, "D001",
                 IMG_FRAME_COMMAND_LEN);         // frame.command = "D001"
+		frame.address = 'Z';
     }
 
     return frame;
@@ -51,7 +50,7 @@ Frame create_frame(FrameType type) {
 /*
  * Send a information/image frame to the display through the serial port.
  */
-void send_frame(const Frame *frame) {
+void send_frame(const Frame *frame, int line) {
     uart_transmit((unsigned char)frame->start);
     uart_transmit((unsigned char)frame->address);
     
@@ -62,17 +61,15 @@ void send_frame(const Frame *frame) {
     }
 
     if (frame->type == Information) {
-        for (uint8_t i = 0; i < INFO_FRAME_LINE_LEN; i++) {
-            uart_transmit((unsigned char)frame->line_1[i]);
-        }
-
-        for (uint8_t i = 0; i < INFO_FRAME_LINE_LEN; i++) {
-            uart_transmit((unsigned char)frame->line_2[i]);
-        }
-        
-        for (uint8_t i = 0; i < INFO_FRAME_LINE_LEN; i++) {
-            uart_transmit((unsigned char)frame->line_3[i]);
-        }
+		for (uint8_t i = 0; i < INFO_FRAME_LINE_LEN; i++) {
+			uart_transmit((unsigned char)frame->line_1[i]);
+		}
+		
+		if (line == 1) {
+			for (uint8_t i = 0; i < INFO_FRAME_LINE_LEN; i++) {
+				uart_transmit((unsigned char)frame->line_2[i]);
+			}
+		}
     }
 
     for (uint8_t i = 0; i < FRAME_CHECKSUM_LEN; i++) {
@@ -99,19 +96,19 @@ void uart_transmit(unsigned char data) {
  */
 unsigned char uart_receive() {
     // Wait until data received flag set
-    while (UCSR1A & (1 << RXC1) == 0) {
+    while ( !(UCSR1A & (1 << RXC1))) {
         ;
     }
-
+	
     return UDR1;
 }
 
 /*
  * Sets all elements of a specified array to 0.
  */
-void clear_array(char arr[], uint8_t length) {
+void clear_array(char arr[], uint8_t length, unsigned char c) {
     for (uint8_t i = 0; i < length; i++) {
-        arr[i] = 0;
+        arr[i] = c;
     }
 }
 
@@ -121,7 +118,7 @@ void clear_array(char arr[], uint8_t length) {
  * checksum = sum(start, address, command, [message]) mod 256
  *
  */
-uint8_t calculate_checksum(const Frame *frame) {
+uint8_t calculate_checksum(const Frame *frame, int line) {
     uint8_t sum = frame->start + (uint8_t)frame->address;
     
     for (int8_t i = 0; i < INFO_FRAME_COMMAND_LEN; i++) {
@@ -131,8 +128,10 @@ uint8_t calculate_checksum(const Frame *frame) {
     if (frame->type == Information) {
         for (int8_t i = 0; i < INFO_FRAME_LINE_LEN; i++) {
             sum = sum + (uint8_t)frame->line_1[i];
-            sum = sum + (uint8_t)frame->line_2[i];
-            sum = sum + (uint8_t)frame->line_3[i];
+			
+			if (line == 1) {
+				sum = sum + (uint8_t)frame->line_2[i];
+			}
         }
     }
 
