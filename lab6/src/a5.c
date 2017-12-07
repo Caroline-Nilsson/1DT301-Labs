@@ -1,3 +1,31 @@
+//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+//   1DT301, Computer Technology I
+//   Date: 2017-12-07
+//   Author:
+//                       Caroline Nilsson            (cn222nd)
+//                       Daniel Alm Grundström       (dg222dw)
+//
+//   Lab number:         6
+//   Title:              CyberTech Wall Display
+//
+//   Hardware:           STK600, CPU ATmega2560, CyberTech Wall Display
+//
+//   Function:           todo
+//
+//   Input ports:        todo
+//
+//   Output ports:       todo
+//
+//   Functions:			 todo
+//   Included files:     display_utils.h
+//
+//   Other information:  todo
+//
+//   Changes in program: 2017-12-07:
+//						 Adds headers and comments.
+//
+//
+//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 #include <string.h>
 
 #include <avr/io.h>

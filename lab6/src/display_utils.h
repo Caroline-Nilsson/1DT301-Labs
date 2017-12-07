@@ -1,10 +1,11 @@
 #ifndef DISPLAY_UTILS_H
 #define DISPLAY_UTILS_H
 
-#include <stdint.h>
+#include <stdint.h>		// uint8_t
 
 // Constants
 #define TRANSFER_RATE 6                 // = 2400 bps (for 1MHz)
+
 #define INFO_FRAME_COMMAND_LEN  5
 #define IMG_FRAME_COMMAND_LEN  4
 #define INFO_FRAME_LINE_LEN 24
