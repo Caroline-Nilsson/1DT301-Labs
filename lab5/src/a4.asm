@@ -1,3 +1,60 @@
+;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+;   1DT301, Computer Technology I
+;   Date: 2017-10-30
+;   Author:
+;                       Caroline Nilsson            (cn222nd)
+;                       Daniel Alm Grundström       (dg222dw)
+;
+;   Lab number:         5
+;   Title:              Display JHD202
+;
+;   Hardware:           STK600, CPU ATmega2560, LCD JHD202
+;
+;   Function:           Recieve 4 lines on serial port show each
+;						line during 5 seconds
+;
+;   Input ports:        RS232
+;
+;   Output ports:       PORTE
+;
+;   Subroutines:        four_row_loop:			writes 4 lines to display
+;												then start from the begining
+;						init_display:			initialize Display
+;						clear_display:			clear display
+;						write_char:				set RS = RS_ON
+;						write_cmd:				clear RS
+;						write:					write to display
+;						write_nibble:			write nibble to display
+;												(subroutine of write)
+;						short_wait: 			delay
+;						long_wait:  			delay
+;						dbnc_wait:  			delay
+;						power_up_wait:			delay
+;						wait_loop:  			delay
+;						switch_output:			modify output to fit display
+;						read_lines:				collect char, check if it is 
+;												NEW_LINE
+;						store_char:				store char to X
+;						read_lines_end:			store NEW_LINE to X
+;						write_main:				write char from X
+;						write_lines_end:		return
+;						write_new_lines:		clear display
+;						write_new_line:			write 40 space to display
+;												(to write on second line)
+;						write_second_line:		write char from Y 
+;						write_second_line_end:	return
+;						delay_5sec:				5 sec delay
+;
+;   Included files:     m2560def.inc
+;
+;   Other information:  "#" = NEW_LINE
+;
+;   Changes in program: 2017-10-14
+;                       Implements flowchart design.
+;
+;                       2017-10-30
+;                       Changes during lab session
+;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 .include "m2560def.inc"
 .def temp = r16
 .def data = r17
@@ -47,14 +104,16 @@ reset:
     
     sei
     
+	;initialize X and clear counter
 	clr counter
 	ldi XH, HIGH(RAM_ADDR)
 	ldi XL, LOW(RAM_ADDR)
 
+	;read lines from Putty (serial port)
     rcall read_lines
 
 main_loop:
-	
+	;set X and Y to same memory location
 	ldi XH, HIGH(RAM_ADDR)
 	ldi XL, LOW(RAM_ADDR)
 	
@@ -65,14 +124,15 @@ main_loop:
 four_row_loop:
 	inc counter
 	
-	rcall write_main
-	rcall delay_5sec
-	rcall write_new_lines
+	rcall write_main					;write first line on LCD
+	rcall delay_5sec					;delay
+	rcall write_new_lines				;write second line
 	
 	cpi counter, 4
-	brlo four_row_loop
+	brlo four_row_loop					
 	
-    rjmp main_loop
+    rjmp main_loop						;when counter >= 4 start from main_loop
+										;again
 
 ; Display subroutines
 init_display:
@@ -189,9 +249,9 @@ read_lines_end:
 	st X+, data
     ret
 
-	
+; write from X to the Display
+; until NEW_LINE	
 write_main:
-	
 	ld data, X+
 	
 	cpi data, NEW_LINE
