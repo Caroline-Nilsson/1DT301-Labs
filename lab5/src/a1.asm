@@ -1,3 +1,44 @@
+;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+;   1DT301, Computer Technology I
+;   Date: 2017-10-30
+;   Author:
+;                       Caroline Nilsson            (cn222nd)
+;                       Daniel Alm Grundström       (dg222dw)
+;
+;   Lab number:         5
+;   Title:              Display JHD202
+;
+;   Hardware:           STK600, CPU ATmega2560, LCD JHD202
+;
+;   Function:           Display character % on LCD
+;
+;   Input ports:        
+;
+;   Output ports:       PORTE
+;
+;   Subroutines:        init_display:		initialize Display
+;						clear_display:		clear display
+;						write_char:			set RS = RS_ON
+;						write_cmd:			clear RS
+;						write:				write to display
+;						write_nibble:		write nibble to display
+;											(subroutine of write)
+;						short_wait: 		delay
+;						long_wait:  		delay
+;						dbnc_wait:  		delay
+;						power_up_wait:		delay
+;						wait_loop:  		delay
+;						switch_output:		modify output to fit display
+;   Included files:     m2560def.inc
+;
+;   Other information:  
+;
+;   Changes in program: 2017-10-14
+;                       Implements flowchart design.
+;
+;                       2017-10-30
+;                       Changes during lab session
+;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 .include "m2560def.inc"
 .def temp = r16
 .def data = r17
